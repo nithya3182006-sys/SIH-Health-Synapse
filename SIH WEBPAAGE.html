@@ -1,0 +1,3793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Health Assistant</title>
+  <style>
+     body { margin: 0; font-family: Arial, sans-serif; }
+
+    /* ---------------- INTRO PAGE ---------------- */
+     .intro {
+       height: 100vh;
+       background: url("https://images.unsplash.com/photo-1576091160550-2173dba999ef") no-repeat center center/cover;
+       display: flex; justify-content: center; align-items: center;
+       text-align: center; color: white; position: relative;
+      }
+      .intro::before { content: ""; position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
+      .intro-content { position: relative; z-index: 2; max-width: 600px; }
+      .intro h1 { font-size: 40px; margin-bottom: 20px; }
+      .intro p { font-size: 18px; margin-bottom: 30px; }
+      .enter-btn { padding: 12px 25px; background: #0f766e; color: white; border: none; font-size: 18px; border-radius: 6px; cursor: pointer; }
+      .enter-btn:hover { background: #0a4f4a; }
+
+    /* ---------------- MAIN PAGE ---------------- */
+      .main-page { display: none; padding-top: 70px; }
+
+    /* Emergency Button */
+      .emergency-btn {
+        position: fixed; top: 0; left: 0; width: 100%; text-align: center;
+        background: red; color: white; font-size: 20px; font-weight: bold;
+        padding: 15px; text-decoration: none; z-index: 9999; animation: pulse 1s infinite;
+      }
+      @keyframes pulse {
+        0% {background: red; box-shadow: 0 0 5px red;}
+        50% {background: #b30000; box-shadow: 0 0 25px red;}
+        100% {background: red; box-shadow: 0 0 5px red;}
+      }
+       
+    .tabs {
+      display: flex;
+      background: #0077b6;
+    }
+    
+    .tabs button:hover {
+      background: #023e8a;
+    }
+    .tab-content {
+      display: none;
+      padding: 20px;
+      background: rgb(254, 252, 252);
+      color:#000
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .hospital-card {
+      background: #f9f3f3;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(81, 69, 69, 0.1);
+    }
+    
+      .hospital-card h3 {
+        margin: 0 0 10px 0;
+      }
+      .hospital-card p {
+        margin: 5px 0;
+        color: #555;
+      }
+      
+     
+
+
+
+    .body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      color: black; /* All text in black */
+    }
+    .tabs {
+      display: flex;
+      background: #0077b6;
+    }
+    .tabs button {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      background: #0077b6;
+      color: black; /* Tab text in black */
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .tab-content {
+      padding: 20px;
+      background: white;
+    }
+    .hospital-card {
+      background: #f1f1f1;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .hospital-card h3 {
+      margin: 0;
+      color: black;
+    }
+    .hospital-card p {
+      margin: 5px 0;
+      color: #555;
+    }
+
+    
+
+
+  </style>
+
+<style id="healthcare-hide-long-sections">
+/* The compact dashboard is the primary service selector. Existing detailed sections remain in the file
+   and can be reached from their relevant card. */
+</style>
+
+</head>
+
+<body>
+
+
+ <div class="intro" id="intro">
+   <div class="intro-content">
+     <h1>Welcome to Smart Health Assistant</h1>
+     <p>Your trusted digital companion for connecting with hospitals, doctors, and healthcare services. 
+      Designed with modern technology and user-friendly features, this platform helps you access care 
+      quickly, efficiently, and professionally.</p>
+     <button class="enter-btn" onclick="enterSite()">Enter Website</button>
+   </div>
+ </div>
+
+
+  <div class="main-page" id="mainPage">
+      <a href="tel:108" class="emergency-btn">🚨 EMERGENCY - CALL AMBULANCE</a>
+    
+  </div>
+
+ 
+  <script>
+
+     function enterSite(){
+     document.getElementById("intro").style.display="none";
+     document.getElementById("mainPage").style.display="block";
+     
+    }
+    function openTab(tabId) {
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(content => content.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+     
+    let chatBox = document.getElementById("chatBox");
+    let input = document.getElementById("input");
+
+    function sendMessage(){
+      let text = input.value.trim();
+      if(text==="") return;
+      addMessage(text,"user");
+      setTimeout(function(){
+      let reply = getReply(text);
+      addMessage(reply,"bot");
+      },500);
+      input.value="";
+    }
+
+    function addMessage(message,type){
+       let div = document.createElement("div");
+       div.classList.add("message",type);
+       div.innerText = message;
+       chatBox.appendChild(div);
+       chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    function openTab(tabId) {
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(content => content.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+
+  </script>
+
+
+
+  
+
+
+
+<style id="healthcare-dashboard-overhaul">
+  /* Spacious modern service dashboard */
+  .sih-dashboard-wrap{
+    max-width:1220px;
+    margin:42px auto 64px;
+    padding:0 26px;
+  }
+  .sih-dashboard-head{
+    text-align:center;
+    margin-bottom:32px;
+  }
+  .sih-dashboard-head h2{
+    margin:0 0 10px;
+    font-size:clamp(28px,4vw,40px);
+    line-height:1.15;
+    letter-spacing:-.6px;
+    font-weight:750;
+  }
+  .sih-dashboard-head p{
+    margin:0 auto;
+    max-width:650px;
+    font-size:15px;
+    line-height:1.65;
+    opacity:.66;
+  }
+
+  .sih-service-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:20px;
+    align-items:stretch;
+  }
+
+  .sih-service-card{
+    min-height:190px;
+    aspect-ratio:auto;
+    box-sizing:border-box;
+    border:1px solid rgba(100,116,139,.15);
+    border-radius:24px;
+    padding:25px 20px 22px;
+    background:rgba(255,255,255,.88);
+    backdrop-filter:blur(12px);
+    box-shadow:0 8px 28px rgba(15,23,42,.055);
+    cursor:pointer;
+    transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    text-align:center;
+    color:inherit;
+  }
+  [data-theme="dark"] .sih-service-card{
+    background:rgba(15,23,42,.78);
+  }
+  .sih-service-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 16px 38px rgba(15,23,42,.11);
+    border-color:rgba(37,99,235,.25);
+  }
+
+  /* Larger breathing room around the custom icon */
+  .sih-icon{
+    width:92px;
+    height:92px;
+    min-width:92px;
+    border-radius:24px;
+    display:grid;
+    place-items:center;
+    line-height:1;
+    background:rgba(59,130,246,.085);
+    box-shadow:inset 0 0 0 1px rgba(59,130,246,.06);
+    margin-bottom:15px;
+    flex:0 0 auto;
+    color:#2563eb;
+  }
+  .sih-icon svg{ width:46px; height:46px; }
+  .sih-service-card.sih-donate .sih-icon{ background:rgba(220,38,38,.09); color:#dc2626; }
+  .sih-service-card.sih-blood .sih-icon{ background:rgba(37,99,235,.09); color:#2563eb; }
+  [data-theme="dark"] .sih-icon{ background:rgba(59,130,246,.16); }
+  [data-theme="dark"] .sih-service-card.sih-donate .sih-icon{ background:rgba(220,38,38,.18); }
+
+  .sih-service-card h3{
+    margin:0;
+    font-size:16px;
+    line-height:1.3;
+    font-weight:720;
+    letter-spacing:.05px;
+  }
+  .sih-open{
+    margin-top:auto;
+    padding-top:13px;
+    font-size:16px;
+    line-height:1;
+    font-weight:700;
+    opacity:.5;
+  }
+  .sih-back-btn{
+    display:none;
+    position:sticky;
+    top:10px;
+    z-index:50;
+    margin:0 0 16px;
+    border:0;
+    border-radius:12px;
+    padding:10px 16px;
+    cursor:pointer;
+    font-weight:700;
+    background:#0f172a;
+    color:#fff;
+    align-items:center;
+    gap:8px;
+  }
+  .sih-back-btn.sih-visible{ display:inline-flex; }
+  .legacy-service-section{ scroll-margin-top:16px; }
+  .legacy-service-section.sih-highlight{ outline:3px solid #2563eb; outline-offset:6px; border-radius:10px; }
+
+  .sih-panel{
+    display:none;
+    margin-top:24px;
+    padding:28px;
+    border-radius:24px;
+    border:1px solid rgba(100,116,139,.15);
+    background:rgba(255,255,255,.94);
+    box-shadow:0 14px 42px rgba(15,23,42,.075);
+  }
+  [data-theme="dark"] .sih-panel{
+    background:rgba(15,23,42,.94);
+  }
+  .sih-panel.active{
+    display:block;
+    animation:sihFade .2s ease;
+  }
+  @keyframes sihFade{
+    from{opacity:0;transform:translateY(8px)}
+    to{opacity:1;transform:none}
+  }
+  .sih-panel-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:20px;
+  }
+  .sih-panel-top h3{
+    margin:0;
+    font-size:22px;
+  }
+  .sih-close{
+    border:0;
+    border-radius:12px;
+    padding:9px 13px;
+    cursor:pointer;
+    background:rgba(100,116,139,.10);
+    font-weight:700;
+  }
+
+  .sih-detail-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:15px;
+  }
+  .sih-detail{
+    padding:18px;
+    border-radius:16px;
+    background:rgba(100,116,139,.055);
+    border:1px solid rgba(100,116,139,.09);
+  }
+  .sih-detail strong{
+    display:block;
+    margin-bottom:7px;
+  }
+  .sih-detail small{
+    opacity:.68;
+    line-height:1.5;
+  }
+  .sih-action{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    margin-top:13px;
+    border:0;
+    border-radius:11px;
+    padding:10px 13px;
+    cursor:pointer;
+    font-weight:700;
+  }
+  .sih-note{
+    margin-top:16px;
+    font-size:12px;
+    opacity:.60;
+    line-height:1.55;
+  }
+
+  .legacy-service-container{display:none}
+  body.service-detail-mode .sih-dashboard-wrap{margin-bottom:20px}
+  body.service-detail-mode .legacy-service-container{display:block}
+  body.service-detail-mode .legacy-service-container.service-hidden{display:none}
+
+  @media(max-width:1000px){
+    .sih-service-grid{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+  }
+  @media(max-width:720px){
+    .sih-dashboard-wrap{
+      margin-top:32px;
+      padding:0 16px;
+    }
+    .sih-service-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:15px;
+    }
+    .sih-service-card{
+      min-height:180px;
+      padding:22px 16px 19px;
+      border-radius:21px;
+    }
+    .sih-icon{
+      width:78px;
+      height:78px;
+      min-width:78px;
+      margin-bottom:13px;
+    }
+    .sih-icon svg{ width:38px; height:38px; }
+    .sih-detail-grid{
+      grid-template-columns:1fr;
+    }
+  }
+  @media(max-width:420px){
+    .sih-service-grid{
+      gap:12px;
+    }
+    .sih-service-card{
+      min-height:150px;
+      padding:18px 10px 15px;
+    }
+    .sih-icon{
+      width:70px;
+      height:70px;
+      min-width:70px;
+      border-radius:18px;
+      margin-bottom:11px;
+    }
+    .sih-icon svg{ width:34px; height:34px; }
+    .sih-service-card h3{
+      font-size:14px;
+    }
+  }
+</style>
+
+<section class="healthcare-dashboard-wrap" id="healthcareDashboard">
+  <div class="healthcare-dashboard-head">
+    <h2>Smart Healthcare Services</h2>
+    <p>Tap a service to open it directly — nothing else to scroll through.</p>
+  </div>
+
+  <button class="sih-back-btn" id="sihBackBtn" type="button" onclick="sihBackToServices()">← Back to services</button>
+
+  <div class="sih-service-grid" id="sihServiceGrid">
+    <button class="sih-service-card" type="button" aria-label="Hospitals and doctors" onclick="openServicePanel('hospitals')">
+      <span class="sih-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V7a2 2 0 0 1 2-2h3V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2h3a2 2 0 0 1 2 2v14"/><path d="M4 21h16"/><path d="M12 8v6M9 11h6"/><path d="M9 21v-4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4"/></svg></span>
+      <h3>Hospitals</h3>
+    </button>
+    <button class="sih-service-card" type="button" aria-label="Bed availability" onclick="openServicePanel('beds')">
+      <span class="sih-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18v2M21 18v2"/><path d="M3 13V7a1 1 0 0 1 1-1h5v5"/><path d="M13 11h5"/></svg></span>
+      <h3>Beds</h3>
+    </button>
+    <button class="sih-service-card sih-blood" type="button" aria-label="Search blood availability" onclick="openServicePanel('blood')">
+      <span class="sih-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3c2 2.4 3.6 4.6 3.6 6.5a3.6 3.6 0 1 1-7.2 0C7.4 7.6 9 5.4 11 3Z"/><circle cx="16.5" cy="16.5" r="3"/><path d="M18.6 18.6 21 21"/></svg></span>
+      <h3>Blood</h3>
+    </button>
+    <button class="sih-service-card" type="button" aria-label="Medicine availability" onclick="openServicePanel('medicine')">
+      <span class="sih-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-45 12 12)"/><path d="M9.5 9.5 14.5 14.5"/></svg></span>
+      <h3>Medicine</h3>
+    </button>
+    <button class="sih-service-card" type="button" aria-label="High risk patient monitoring" onclick="openServicePanel('monitoring')">
+      <span class="sih-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></span>
+      <h3>Monitor</h3>
+    </button>
+    <button class="sih-service-card" type="button" aria-label="Oxygen cylinder availability" onclick="openServicePanel('oxygen')">
+      <span class="sih-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="6" width="8" height="15" rx="3"/><path d="M10 6V4a2 2 0 0 1 2-2 2 2 0 0 1 2 2v2"/><path d="M8 11h8"/></svg></span>
+      <h3>Oxygen</h3>
+    </button>
+    <button class="sih-service-card" type="button" aria-label="Veterinary care" onclick="openServicePanel('veterinary')">
+      <span class="sih-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><ellipse cx="7" cy="9.3" rx="1.9" ry="2.4"/><ellipse cx="12" cy="6.6" rx="2" ry="2.5"/><ellipse cx="17" cy="9.3" rx="1.9" ry="2.4"/><path d="M12 12c2.9 0 5.4 1.8 5.4 4.3 0 1.9-1.6 3.2-3.6 2.7-1-.3-2.5-.3-3.5 0-2 .5-3.6-.8-3.6-2.7C6.6 13.8 9.1 12 12 12Z"/></svg></span>
+      <h3>Veterinary</h3>
+    </button>
+    <button class="sih-service-card sih-donate" type="button" aria-label="Blood donation appointment" onclick="openServicePanel('donation')">
+      <span class="sih-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c2.6 3 5 6 5 9.2a5 5 0 1 1-10 0C7 9 9.4 6 12 3Z"/><path d="M12 10.5v4M10 12.5h4"/></svg></span>
+      <h3>Donate</h3>
+    </button>
+    <button class="sih-service-card" type="button" aria-label="AI health assistant chatbot" onclick="openServicePanel('chatbot')">
+      <span class="sih-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"/><circle cx="9" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="10.5" r="1" fill="currentColor" stroke="none"/></svg></span>
+      <h3>Assistant</h3>
+    </button>
+  </div>
+
+  <div id="healthcarePanel" class="sih-panel" aria-live="polite">
+    <div class="sih-panel-top"><h3 id="healthcarePanelTitle"></h3><button class="sih-close" type="button" onclick="closeServicePanel()">✕ Close</button></div>
+    <div id="healthcarePanelContent"></div>
+  </div>
+</section>
+
+<script id="healthcare-dashboard-script">
+const SERVICE_DATA = {
+ hospitals: {
+  title:'Hospitals & Doctors',
+  html:`<div class="sih-detail-grid">
+    <div class="sih-detail"><strong>Nearby Hospitals</strong><small>Find hospitals with contact details, distance and map navigation.</small><br><button class="sih-action" onclick="sihShowLegacy('hospitals')">Open hospital list</button></div>
+    <div class="sih-detail"><strong>Doctor Search</strong><small>Browse specialties and doctor schedules.</small><br><button class="sih-action" onclick="sihShowLegacy('doctors')">View doctors</button></div>
+    <div class="sih-detail"><strong>Appointments</strong><small>Book an in-clinic or online consultation.</small><br><button class="sih-action" onclick="sihShowLegacy('appointment')">Book appointment</button></div>
+  </div><div class="sih-note">Prototype data should be connected to verified hospital/provider systems before real-world deployment.</div>`
+ },
+ beds:{
+  title:'Bed Availability',
+  html:`<div class="sih-detail-grid">
+   <div class="sih-detail"><strong>General Beds</strong><small>View currently listed general-bed availability by hospital.</small></div>
+   <div class="sih-detail"><strong>ICU Beds</strong><small>Check ICU availability and contact the hospital for confirmation.</small></div>
+   <div class="sih-detail"><strong>Private / Maternity</strong><small>View the corresponding bed category from the availability list.</small></div>
+  </div><button class="sih-action" onclick="sihShowLegacy('beds')">Open full bed availability</button><div class="sih-note">Availability shown in the prototype must be verified directly with the hospital before admission.</div>`
+ },
+ blood:{
+  title:'Blood Availability',
+  html:`<div class="sih-detail-grid">
+   <div class="sih-detail"><strong>Blood Group Search</strong><small>Search the existing blood inventory by blood group.</small></div>
+   <div class="sih-detail"><strong>Nearby Centres</strong><small>Find listed hospitals and blood centres with contact information.</small></div>
+   <div class="sih-detail"><strong>Urgent Need</strong><small>For emergencies, contact the hospital/blood bank directly and use the emergency support option.</small></div>
+  </div><button class="sih-action" onclick="sihShowLegacy('blood')">Open blood availability</button><div class="sih-note">Looking to give blood instead? Use the separate <strong>Donate</strong> card.</div>`
+ },
+ medicine:{
+  title:'Medicine Availability',
+  html:`<div class="sih-detail-grid">
+   <div class="sih-detail"><strong>Medicine Search</strong><small>Search a medicine name and view prototype pharmacy stock.</small><input id="sihMedicineInput" style="width:100%;margin-top:9px;padding:10px;border-radius:9px;border:1px solid #cbd5e1" placeholder="e.g. Paracetamol"></div>
+   <div class="sih-detail"><strong>Stock Status</strong><small id="sihMedicineResult">Enter a medicine name to check demo stock.</small></div>
+   <div class="sih-detail"><strong>Important</strong><small>Medicine availability does not confirm suitability or a prescription. Follow a qualified clinician/pharmacist.</small></div>
+  </div><button class="sih-action" onclick="checkSIHMedicine()">Check availability</button>`
+ },
+ monitoring:{
+  title:'High-Risk Patient Monitoring',
+  html:`<div class="sih-detail-grid">
+   <div class="sih-detail"><strong>Patient</strong><input id="sihPatientName" style="width:100%;margin-top:8px;padding:9px;border-radius:9px;border:1px solid #cbd5e1" placeholder="Patient name"></div>
+   <div class="sih-detail"><strong>Heart Rate</strong><input id="sihHR" type="number" style="width:100%;margin-top:8px;padding:9px;border-radius:9px;border:1px solid #cbd5e1" placeholder="bpm"></div>
+   <div class="sih-detail"><strong>SpO₂</strong><input id="sihSpO2" type="number" style="width:100%;margin-top:8px;padding:9px;border-radius:9px;border:1px solid #cbd5e1" placeholder="%"></div>
+  </div><button class="sih-action" onclick="runSIHRiskCheck()">Run monitoring check</button><div id="sihRiskResult" class="sih-note"></div>`
+ },
+ oxygen:{
+  title:'Oxygen Cylinder Availability',
+  html:`<div class="sih-detail-grid">
+   <div class="sih-detail"><strong>Cylinder Stock</strong><small>View listed oxygen cylinder stock across partner centres.</small></div>
+   <div class="sih-detail"><strong>Urgent Need</strong><small>For emergencies, contact the supplier directly and use the emergency support option.</small></div>
+  </div><button class="sih-action" onclick="sihShowLegacy('oxygen')">Open oxygen availability</button>`
+ },
+ veterinary: {
+  title:'Veterinary Care',
+  html:`<div class="sih-detail-grid">
+   <div class="sih-detail"><strong>Pet Clinics</strong><small>Browse listed veterinary clinics and their timings.</small></div>
+   <div class="sih-detail"><strong>Emergency Support</strong><small>Use nearby veterinary contacts and call the clinic directly for urgent cases.</small></div>
+   <div class="sih-detail"><strong>Pet Health</strong><small>AI assistance can provide general information, not a veterinary diagnosis.</small></div>
+  </div><button class="sih-action" onclick="sihShowLegacy('veterinary')">Open veterinary clinics</button>`
+ },
+ donation:{
+  title:'Blood Donation',
+  html:`<div class="sih-detail-grid">
+   <div class="sih-detail"><strong>Eligibility</strong><small>Check the project's donor eligibility guidance.</small></div>
+   <div class="sih-detail"><strong>Donation Centres</strong><small>View listed donation centres and available slots.</small></div>
+   <div class="sih-detail"><strong>Appointment</strong><small>Schedule a donation appointment.</small></div>
+  </div><button class="sih-action" onclick="sihShowLegacy('donation')">Open donation booking</button><div class="sih-note">Looking to find blood instead? Use the separate <strong>Blood</strong> card.</div>`
+ },
+ chatbot:{
+  title:'AI Health Assistant',
+  html:`<div class="sih-detail-grid">
+   <div class="sih-detail"><strong>Multilingual Chat</strong><small>Ask healthcare-related questions in English, Tamil or Hindi.</small></div>
+   <div class="sih-detail"><strong>Voice Input</strong><small>Use the browser's speech-recognition capability where supported.</small></div>
+   <div class="sih-detail"><strong>Safe Assistance</strong><small>Designed for information and navigation; not a replacement for professional medical care.</small></div>
+  </div><button class="sih-action" onclick="openMainChat()">Open assistant</button>`
+ }
+};
+
+function openServicePanel(key){
+ const d=SERVICE_DATA[key]; if(!d)return;
+ document.getElementById('healthcarePanelTitle').textContent=d.title;
+ document.getElementById('healthcarePanelContent').innerHTML=d.html;
+ document.getElementById('healthcarePanel').classList.add('active');
+ document.getElementById('healthcarePanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closeServicePanel(){document.getElementById('healthcarePanel').classList.remove('active')}
+function checkSIHMedicine(){
+ const q=(document.getElementById('sihMedicineInput')?.value||'').trim();
+ const r=document.getElementById('sihMedicineResult');
+ if(!q){r.textContent='Please enter a medicine name.';return}
+ const stock={'paracetamol':'Available • Demo Pharmacy A','cetirizine':'Available • Demo Pharmacy B','amoxicillin':'Check prescription • Demo Pharmacy C'};
+ r.textContent=stock[q.toLowerCase()]||'No demo stock record found. Connect this module to a pharmacy inventory API/database for live availability.';
+}
+function runSIHRiskCheck(){
+ const hr=Number(document.getElementById('sihHR')?.value), spo=Number(document.getElementById('sihSpO2')?.value);
+ const out=document.getElementById('sihRiskResult');
+ if(!hr || !spo){out.textContent='Please enter both heart rate and SpO₂.';return}
+ const flags=[];
+ if(spo<90) flags.push('SpO₂ is below the configured demo threshold.');
+ if(hr<50 || hr>120) flags.push('Heart rate is outside the configured demo range.');
+ out.innerHTML=flags.length ? '🚨 <strong>Attention:</strong> '+flags.join(' ')+' If this reflects a real patient, seek prompt professional medical assessment.' : '✅ No alert from these demo thresholds. Continue monitoring and follow the clinician’s care plan.';
+}
+
+/* ---- Real click-through navigation for the existing detailed sections ---- */
+(function(){
+  const CONTAINER_MAP = {
+    hospitals:['Hospitals Near You'],
+    doctors:['Doctor Schedules'],
+    appointment:['Book an Appointment'],
+    beds:['Bed Availability in Hospitals'],
+    blood:['Blood Availability in Hospitals'],
+    donation:['Book a Blood Donation Appointment'],
+    veterinary:['Veterinary Hospitals'],
+    oxygen:['Oxygen Cylinder Availability']
+  };
+  function allContainers(){ return [...document.querySelectorAll('.container')]; }
+  function hideAllContainers(){ allContainers().forEach(c=>{ c.style.display='none'; }); }
+  document.addEventListener('DOMContentLoaded', hideAllContainers);
+
+  window.sihShowLegacy = function(key){
+    const headings = CONTAINER_MAP[key]; if(!headings) return;
+    hideAllContainers();
+    document.getElementById('healthcarePanel').classList.remove('active');
+    document.getElementById('sihServiceGrid').style.display='none';
+    document.querySelector('.healthcare-dashboard-head').style.display='none';
+    let first=null;
+    allContainers().forEach(c=>{
+      const h2=c.querySelector('h2');
+      const txt=h2?h2.textContent.trim():'';
+      if(headings.some(h=>txt.includes(h))){
+        c.style.display='';
+        c.classList.add('legacy-service-section');
+        if(!first) first=c;
+      }
+    });
+    document.getElementById('sihBackBtn').classList.add('sih-visible');
+    if(first){
+      first.scrollIntoView({behavior:'smooth',block:'start'});
+      first.classList.add('sih-highlight');
+      setTimeout(()=>first.classList.remove('sih-highlight'),1400);
+    }
+  };
+
+  window.sihBackToServices = function(){
+    hideAllContainers();
+    document.getElementById('sihBackBtn').classList.remove('sih-visible');
+    document.getElementById('sihServiceGrid').style.display='';
+    document.querySelector('.healthcare-dashboard-head').style.display='';
+    document.getElementById('healthcarePanel').classList.remove('active');
+    document.getElementById('healthcareDashboard').scrollIntoView({behavior:'smooth',block:'start'});
+  };
+
+  window.openMainChat = function(){
+    closeServicePanel();
+    const box=document.getElementById('chatbot-box');
+    if(box && box.style.display!=='block'){ toggleChat(); }
+    document.getElementById('chatbot-box').scrollIntoView({behavior:'smooth',block:'center'});
+  };
+})();
+</script>
+
+
+</body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+  <title>Nearby Hospitals & Doctor Appointments</title>
+  <style>
+    :root{
+      --bg-image: url('https://images.unsplash.com/photo-1586773860418-d37222d8fce3');
+      --bg: #ffffff;
+      --text: #0b2447;
+      --header-bg: rgba(0,51,102,0.95);
+      --container-bg: rgba(255,255,255,0.9);
+      --card-bg: rgba(255,255,255,0.9);
+      --muted: #666;
+      --accent: #0066cc;
+      --accent-strong: #004d99;
+      --highlight: #ffd700;
+      --chat-header: #2b7a78;
+    }
+
+    [data-theme="dark"]{
+      --bg: #071025;
+      --text: #e6f2ff;
+      --header-bg: rgba(3,37,65,0.95);
+      --container-bg: rgba(0,0,0,0.5);
+      --card-bg: rgba(255,255,255,0.06);
+      --muted: #cfcfcf;
+      --accent: #0891b2;
+      --accent-strong: #07697f;
+      --highlight: #ffd770;
+      --chat-header: #1f5d5a;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg) var(--bg-image) no-repeat center center fixed;
+      background-size: cover;
+      margin: 0;
+      padding: 0;
+      color: var(--text);
+      transition: background-color .25s ease, color .25s ease;
+    }
+    header {
+      background-color: var(--header-bg);
+      padding: 20px;
+      text-align: center;
+      color: var(--text);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2em;
+      color: white;
+    }
+    header input {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      color: black;
+    }
+    header button {
+      padding: 8px 15px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    header button:hover {
+      background: var(--accent-strong);
+    }
+    .container {
+      background-color: var(--container-bg);
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+    }
+    h2 {
+      border-bottom: 2px solid var(--text);
+      padding-bottom: 10px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    ul li {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: var(--card-bg);
+      border-radius: 5px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    form label {
+      margin: 10px 0 5px;
+    }
+    form input, form select, form textarea {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.95);
+      color: black;
+    }
+    form button {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    form button:hover {
+      background-color: var(--accent-strong);
+    }
+    .hospital-schedule h3 {
+      margin-top: 15px;
+      color: var(--highlight);
+    }
+    .filter-box {
+      background-color: rgba(255,255,255,0.1);
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-box input, .filter-box select {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      color: black;
+      font-size: 14px;
+    }
+    .filter-box button {
+      padding: 6px 12px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .filter-box button:hover {
+      background: var(--accent-strong);
+    }
+    .filter-box button.reset {
+      background: #666;
+    }
+    .filter-box button.reset:hover {
+      background: #555;
+    }
+    
+    /* Blood Availability Styling */
+    .blood-hospital-card {
+      background-color: var(--card-bg);
+      border-left: 4px solid var(--accent);
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+    
+    .blood-hospital-card h3 {
+      margin: 0 0 5px 0;
+    }
+    
+    .blood-hospital-card p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    
+    /* Bed Availability Styling */
+    .bed-hospital-card {
+      background-color: var(--card-bg);
+      border-left: 4px solid #17a2b8;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+    
+    .bed-hospital-card h3 {
+      margin: 0 0 5px 0;
+    }
+    
+    .bed-hospital-card p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Nearby Hospitals & Doctor Appointments</h1>
+      <button id="themeToggle" aria-label="Toggle theme" title="Toggle theme" style="padding:8px 10px; border-radius:6px; background:transparent; border:1px solid rgba(255,255,255,0.08); color:white;">🌙</button>
+    </div>
+  </header>
+
+  <!-- Nearby Hospitals -->
+  <div class="container">
+    <h2>Hospitals Near You</h2>
+    <div style="margin-bottom: 15px; background-color: rgba(255,255,255,0.1); padding: 12px; border-radius: 5px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <select id="hospitalCategory" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333;">
+        <option value="all">Hospital Type: All</option>
+        <option value="general">General Hospital</option>
+        <option value="multispeciality">Multi-speciality</option>
+        <option value="nursing">Nursing Home</option>
+        <option value="medical college">Medical College</option>
+      </select>
+      
+      <select id="mainSearchLocation" style="padding: 8px 12px; border: none; border-radius: 5px;">
+           <option value="all">search type: location</option>
+           <option value="all">All</option>
+           <option value="poonamallee">Poonamallee</option>
+           <option value="thiruvallur">Thiruvallur</option>
+           <option value="avadi">Avadi</option>
+           <option value="ambattur">Ambattur</option>
+           <option value="kovur">Kovur</option>
+           <option value="porur">Porur</option>
+           <option value="ponneri">Ponneri</option>
+           <option value="gummidipoondi">Gummidipoondi</option>
+           <option value="thiruttani">Thiruttani</option>
+           <option value="padi">Padi</option>
+           <option value="uthukkottai">Uthukkottai</option>
+           <option value="minjur">Minjur</option>
+           <option value="red hills">Red Hills</option>
+           <option value="kattupakkam">Kattupakkam</option>
+           <option value="poonamallee-palivakkam signal">Poonamallee-Palivakkam Signal</option>
+           <option value="senneerkuppam">Senneerkuppam</option>
+           <option value="thirumazhisai">Thirumazhisai</option>
+           <option value="mappedu-sunguvarchatram road">Mappedu-Sunguvarchatram Road</option>
+           <option value="gerugambakkam">Gerugambakkam</option>
+           <option value="karayanchavadi">Karayanchavadi</option>
+           <option value="kundrathur">Kundrathur</option>
+           <option value="mangadu">Mangadu</option>
+      </select>
+      <label style="color: #ddd;">Distance (km):</label>
+      <input type="number" id="minDistance" placeholder="Min" min="0" style="padding: 6px; border: none; border-radius: 5px; width: 70px;">
+      <span style="color: #ddd;">-</span>
+      <input type="number" id="maxDistance" placeholder="Max" min="0" style="padding: 6px; border: none; border-radius: 5px; width: 70px;">
+      <input type="text" id="hospitalSearch" placeholder="Search hospitals...">
+      <button onclick="filterHospitals()" style="padding: 6px 12px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Search</button>
+      <button onclick="resetHospitals()" style="padding: 6px 12px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset</button>
+    </div>
+    <ul id="hospitalList">
+      <li><strong>Hope hospital </strong> - 1.0 km away- Ph:9445022257,9444083657,Poonamalle<a href="https://maps.google.com/?q=Hope+Hospital+Poonamallee" target="_blank">📍Map</a></li>
+      <li><strong>Sri balaji Medical and Hospital</strong> - 1.0 km away-Ph:7871767969,Ambattur<a href="https://maps.google.com/?q=Sri+Balaji+Medical+Hospital+Poonamallee" target="_blank">📍Map</a></li>
+      <li><strong>Aachi Hospital</strong> - 2.02 km away-Ph:8695930967(nearby store),Avadi<a href="https://maps.google.com/?q=Aachi+Hospital+Thirumazhisai" target="_blank">📍Map</a></li>
+      <li><strong>Pettai 24 Hours Hospital</strong> - 3.02 km away-Ph:9025111378,Mappedu<a href="https://maps.google.com/?q=Pettai+Hospital+Poonamallee" target="_blank">📍Map</a></li>
+      <li><strong>Panimalar Hospital</strong> - 3.02 km away-Ph:044-283820,poonamalle<a href="https://maps.google.com/?q=Panimalar+Medical+College+Hospital" target="_blank">📍Map</a></li>
+      <li><strong>S.S Hospital</strong> - 3.02 km away-Ph:8939651516(nearby store),Poonamallee<a href="https://maps.google.com/?q=SS+Hospital+Senneerkuppam" target="_blank">📍Map</a></li>
+      <li><strong>Mangalam Hospital</strong> - 4.08 km away-Ph:044-26495599,Red hills<a href="https://maps.google.com/?q=Mangalam+Hospital+Poonamallee" target="_blank">📍Map</a></li> 
+      <li><strong>Be Well Hospital</strong> - 5.01 km away-Ph:9698300300,Porur<a href="https://maps.google.com/?q=Be+Well+Hospital+Poonamallee" target="_blank">📍Map</a></li>
+      <li><strong>Government Hospital</strong> - 5.02 km away-Ph:7402723402,Ambattur<a href="https://maps.google.com/?q=Government+Hospital+Poonamallee" target="_blank">📍Map</a></li>
+      <li><strong>Dr.Ramya's Multi Speciality Hospital</strong> - 5.07 km away-Ph:9043022666,Red Hills<a href="https://maps.google.com/?q=Dr+Ramya+Hospital+Kundrathur" target="_blank">📍Map</a></li>
+      <li><strong>Vasanthi Hospital</strong> - 6.02 km away-Ph:9444038570,Karayanchavadi<a href="https://maps.google.com/?q=Vasanthi+Hospital+Karayanchavadi" target="_blank">📍Map</a></li>
+      <li><strong>Nh Hospital</strong> - 6.02 km away-Ph:9940328454,044-23822333(nearby store),Kundrathur<a href="https://maps.google.com/?q=NH+Hospital+Kundrathur" target="_blank">📍Map</a></li>
+      <li><strong>Sai Nursing Home and Maternity Hospital</strong> - 6.04 km away-Ph:9790928118,044-48530311,Mangadu<a href="https://maps.google.com/?q=Sai+Nursing+Home+Mangadu" target="_blank">📍Map</a></li>
+      <li><strong>saveetha Medical college hospital</strong> - 6-7 km away-Ph:044-66726618,Poonamallee<a href="https://maps.google.com/?q=Saveetha+Medical+College+Hospital" target="_blank">📍Map</a></li>
+      <li><strong>Madha Medical college and Madha Hospital</strong> - 7.02 km away-Ph:95783 61234,Thiruvallur<a href="https://maps.google.com/?q=Madha+Medical+College+Hospital+Kovur" target="_blank">📍Map</a></li>
+      <li><strong>Carewell Hospital</strong> - 7.09 km away-Ph:6381601020,Thirumazhisai<a href="https://maps.google.com/?q=Carewell+Hospital+Kattupakkam" target="_blank">📍Map</a></li>
+      <li><strong>Kanaga Hospital-Multispeciality</strong> - 7.09 km away-Ph:9566256975,Ambur<a href="https://maps.google.com/?q=Kanaga+Hospital+Kundrathur" target="_blank">📍Map</a></li>
+      <li><strong>RMD Specialities Hospital</strong> - 8.03 km away-Ph:9444411219,kovur<a href="https://maps.google.com/?q=RMD+Specialities+Hospital+Kundrathur" target="_blank">📍Map</a></li>
+      <li><strong>Bestow Hospital</strong> - 9.05 km away-Ph:8098042000,Minjur<a href="https://maps.google.com/?q=Bestow+Hospital+Gerugambakkam" target="_blank">📍Map</a></li>
+      <li><strong>Sri Sudharsanam Hospital</strong> - 10.02 km away-Ph:044-26550355,kovur<a href="https://maps.google.com/?q=Sri+Sudharsanam+Hospital+Poonamallee" target="_blank">📍Map</a></li>
+      <li><strong>Meenakshi Hospital</strong> - 10.02 km away-Ph:044-42866621,Ambur<a href="https://maps.google.com/?q=Meenakshi+General+Hospital+Poonamallee" target="_blank">📍Map</a></li>
+    </ul>
+  </div>
+
+  
+  <div class="container">
+    <h2>Doctor Schedules</h2>
+    <div style="margin-bottom: 15px; background-color: rgba(255,255,255,0.1); padding: 12px; border-radius: 5px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <select id="specialityFilter" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333;">
+        <option value="all">Speciality: All</option>
+        <option value="cardiology">Cardiology</option>
+        <option value="general medicine">General Medicine</option>
+        <option value="pediatrics">Pediatrics</option>
+        <option value="orthopedic">Orthopedic</option>
+        <option value="gynecology">Gynecology</option>
+        <option value="dentistry">Dentistry</option>
+        <option value="surgery">Surgery</option>
+        <option value="ent">ENT</option>
+        <option value="dermatology">Dermatology</option>
+        <option value="neurology">Neurology</option>
+      </select>
+      
+      <select id="mainSearchLocation" style="padding: 8px 12px; border: none; border-radius: 5px;">
+           <option value="all">search type: location</option>
+           <option value="all">All</option>
+           <option value="poonamallee">Poonamallee</option>
+           <option value="thiruvallur">Thiruvallur</option>
+           <option value="avadi">Avadi</option>
+           <option value="ambattur">Ambattur</option>
+           <option value="kovur">Kovur</option>
+           <option value="porur">Porur</option>
+           <option value="ponneri">Ponneri</option>
+           <option value="gummidipoondi">Gummidipoondi</option>
+           <option value="thiruttani">Thiruttani</option>
+           <option value="padi">Padi</option>
+           <option value="uthukkottai">Uthukkottai</option>
+           <option value="minjur">Minjur</option>
+           <option value="red hills">Red Hills</option>
+           <option value="kattupakkam">Kattupakkam</option>
+           <option value="poonamallee-palivakkam signal">Poonamallee-Palivakkam Signal</option>
+           <option value="senneerkuppam">Senneerkuppam</option>
+           <option value="thirumazhisai">Thirumazhisai</option>
+           <option value="mappedu-sunguvarchatram road">Mappedu-Sunguvarchatram Road</option>
+           <option value="gerugambakkam">Gerugambakkam</option>
+           <option value="karayanchavadi">Karayanchavadi</option>
+           <option value="kundrathur">Kundrathur</option>
+           <option value="mangadu">Mangadu</option>
+      </select>
+      <input type="text" id="doctorSearch" placeholder="Search doctors..."> 
+      <button onclick="filterDoctors()" style="padding: 8px 15px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Search</button>
+      <button onclick="resetDoctors()" style="padding: 8px 15px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset</button>
+    </div>
+    <div id="doctorSchedulesContainer">
+      <div class="hospital-schedule">
+        <h3>Hope hospital </h3>
+        <ul>
+          <li><strong>Dr.Balakrishnan–Cosultant</strong> - Available:(mon-sun) 07:00 AM – 10:00 PM</li>
+        </ul>
+      </div>
+
+    <div class="hospital-schedule">
+      <h3>Sri Balaji Medical and Hospital</h3>
+      <ul>
+        <li><strong>Dr.N.N.Anand(HOD) –General medicine</strong> - Available:(mon-sat)08:00AM – 04:00 PM</li>
+        <li><strong>Dr. L. Subramanian –orthopaedics</strong> - Available:(mon-sat) 09:00 PM – 01:00 PM</li>
+        <li><strong>Dr. K. Vani(HOD) –Gynaecology</strong> - Available:(mon-sat) 08:00 AM – 03:00 PM</li>
+        <li><strong>Dr.Rajarathinam.M.S –Ophthalmology</strong> - Available:(mon-sat) 09:00 AM – 02:00 PM</li>
+        <li><strong>Dr.Preetham chennareddy –Neurologist</strong> - Available:(mon-sat) 04:00 PM – 08:00 PM</li>
+        <li><strong>Dr. S. Sundari(HOD) –Pediatrician</strong> - Available:(mon-sat) 08:00 AM – 04:00 PM</li>
+        <li><strong>Dr. C.Srinivasan –General surgery</strong> - Available:(mon-sat) 08:00 AM – 04:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Aachi Hospital</h3>
+      <ul>
+        <li><strong>Dr.C.Karunanidhi –Dentistry</strong> - Available: 07:00AM – 09:00PM</li>
+        <li><strong>Dr.K.Gayathiri priya –General surgery</strong> - Available: 07:00AM – 09:00PM</li>
+        <li><strong>Dr.K.Lakshmi priya –General medicine</strong> - Available: 11:00Am – 08:30PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Pettai 24 Hours Hospital</h3>
+      <ul>
+        <li><strong>Dr. Saravanan –General Physician</strong> - Available: 24 hours</li>
+      </ul>
+    </div>
+  
+    <div class="hospital-schedule">
+      <h3>Panimalar Hospital</h3>
+      <ul>
+        <li><strong> Dr. Ravindran T,Dr. Sabaratnavel R., Dr. Manickam K., Dr. Ashok Kumar S., Dr. Srinivasan R.–General medicine</strong> - Available:(mon-sat) 11:00 AM – 03:00 PM</li>
+        <li><strong> Dr. Ravinthar A.–General surgery</strong> - Available: (mon-sat)11:00 AM – 03:00 PM</li>
+        <li><strong> Dr. Padmavathy P., Dr. Tamilselvi D., Dr. Vani K., Dr. Thamizhselvi N.–Obstetrics & Gynaecology</strong> - Available:(mon-sat) 11:00 AM – 03:00 PM</li>
+        <li><strong> Dr. Ramanath A., Dr. Balamma Sujatha, Dr. Benjamin Sagayaraj M., Dr. Karthikeyan P.–Paediatrics</strong> - Available:(mon-sat) 11:00 AM – 03:00 PM</li>
+        <li><strong>Dr. Natarajan S., Dr. Elango M., Dr. Narayanan V. L.–Orthopaedics</strong> - Available:(mon-sat) 11:00 AM – 03:00 PM</li>
+        <li><strong> Dr. Praveen Kumar R. S.–Psychiatry</strong> - Available:(mon-sat) 11:00 AM – 03:00 PM</li>
+        <li><strong> Dr. Vinesh E.–Dentistry</strong> - Available:(mon-sat) 11:00 AM – 03:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>S.S Hospital</h3>
+      <ul>
+        <li><strong> Dr. M. Abid Saliya–senior Neurologist</strong> - Available:24 hours</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Mangalam Hospital</h3>
+      <ul>
+        <li><strong>Dr. S. Ramesh Kumar –General Physician</strong> - Available: 24 hours</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Be Well Hospital</h3>
+      <ul>
+        <li><strong>Dr. Arvind</strong> – Emergency Care – Available:24 Hours</li>
+        <li><strong>Dr. Swetha</strong> – General Physician – Available:(Mon-sun)10:00 AM to 4:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Government Hospital</h3>
+      <ul>
+        <li><strong>Dr. Kumar</strong> – General Medicine – Available:(Mon-sun) 9:00 AM to 2:00 PM</li>
+        <li><strong>Dr. Selvi</strong> – Gynecology – Available:(Mon-sun) 10:00 AM to 1:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Dr Ramya's Hospital</h3>
+      <ul>
+        <li><strong>Dr. Ramya</strong> – Gynecologist – Available:(Mon-sun) 9:30 AM to 1:30 PM</li>
+        <li><strong>Dr. Manoj</strong> – Pediatrician – Available:(Mon-sun) 5:00 PM to 8:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Vasanthi Hospital</h3>
+      <ul>
+        <li><strong>Dr. Vasanthi</strong> – General Physician – Available:(Mon-sun) 9:00 AM to 12:00 PM</li>
+        <li><strong>Dr. Dinesh</strong> – Diabetologist – Available:(Mon-sun) 6:00 PM to 9:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>NH Hospital</h3>
+      <ul>
+        <li><strong>Dr. Harish</strong> – Orthopedic – Available:(Mon-sun) 10:00 AM to 2:00 PM</li>
+        <li><strong>Dr. Nisha</strong> – ENT – Available:(Mon-sun) 5:00 PM to 8:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Sai Nursing Home</h3>
+      <ul>
+        <li><strong>Dr. Sai Kumar</strong> – General Physician – Available:(Mon-sun) 9:00 AM to 1:00 PM</li>
+        <li><strong>Dr. Aarthi</strong> – Gynecology – Available:(Mon-sun) 4:00 PM to 7:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Saveetha Hospital</h3>
+      <ul>
+        <li><strong>Dr. Pradeep</strong> – Cardiologist – Available:(Mon-sun) 10:00 AM to 1:00 PM</li>
+        <li><strong>Dr. Keerthi</strong> – Dentist – Available:(Mon-sun) 2:00 PM to 6:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Madha Hospital</h3>
+      <ul>
+        <li><strong>Dr. Joseph</strong> – General Physician – Available:(Mon-sun) 9:00 AM to 12:00 PM</li>
+        <li><strong>Dr. Latha</strong> – Pediatrician – Available:(Mon-sun) 5:00 PM to 8:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Carefree Hospital</h3>
+      <ul>
+        <li><strong>Dr. Naveen</strong> – Orthopedic – Available:(Mon-sun) 10:00 AM to 2:00 PM</li>
+        <li><strong>Dr. Sneha</strong> – Dermatologist – Available:(Mon-sun) 6:00 PM to 9:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Kanaga Hospital</h3>
+      <ul>
+        <li><strong>Dr. Prakash</strong> – Orthopedic – Available:(Mon-sun) 10:00 AM to 1:00 PM</li>
+        <li><strong>Dr. Revathi</strong> – Pediatrician – Available:(Mon-sun) 5:00 PM to 8:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>RMD Specialities Hospital</h3>
+      <ul>
+        <li><strong>Dr. Karthik</strong> – Cardiologist – Available:(Mon-sun) 9:00 AM to 12:00 PM</li>
+        <li><strong>Dr. Shalini</strong> – ENT Specialist – Available:(Mon-sun) 6:00 PM to 9:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Bestow Hospital</h3>
+      <ul>
+        <li><strong>Dr. Arun</strong> – General Physician – Available:(Mon-sun) 8:00 AM to 12:00 PM</li>
+        <li><strong>Dr. Nivetha</strong> – Dermatologist – Available:(Mon-sun) 4:00 PM to 7:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Sri Sudharsanam Hospital</h3>
+       <ul>
+         <li><strong>Dr. Mohan</strong> – Orthopedic – Available:(Mon-sun) 10:00 AM to 2:00 PM</li>
+         <li><strong>Dr. Lakshmi</strong> – Gynecologist – Available:(Mon-sun) 5:00 PM to 8:00 PM</li>
+      </ul>
+    </div>
+
+    <div class="hospital-schedule">
+      <h3>Meenakshi Hospital</h3>
+      <ul>
+        <li><strong>Dr. Raghavan</strong> – Cardiologist – Available:(Mon-sun) 9:00 AM to 12:00 PM</li>
+        <li><strong>Dr. Divya</strong> – Pediatrician – Available:(Mon-sun) 6:00 PM to 9:00 PM</li>
+      </ul>
+    </div>
+    </div>
+  </div>
+
+  <!-- Blood Availability in Hospitals -->
+  <div class="container">
+    <h2>🩸 Blood Availability in Hospitals</h2>
+    <div style="margin-bottom: 15px; background-color: rgba(255,255,255,0.1); padding: 12px; border-radius: 5px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <select id="bloodTypeFilter" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333;">
+        <option value="all">Blood Type: All</option>
+        <option value="O+">O+ (O Positive)</option>
+        <option value="O-">O- (O Negative)</option>
+        <option value="A+">A+ (A Positive)</option>
+        <option value="A-">A- (A Negative)</option>
+        <option value="B+">B+ (B Positive)</option>
+        <option value="B-">B- (B Negative)</option>
+        <option value="AB+">AB+ (AB Positive)</option>
+        <option value="AB-">AB- (AB Negative)</option>
+      </select>
+      <select id="bloodHospitalFilter" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333;">
+        <option value="all">Hospital: All</option>
+        <option value="Hope Hospital">Hope Hospital</option>
+        <option value="Sri Balaji Medical and Hospital">Sri Balaji Medical and Hospital</option>
+        <option value="Pettai 24 Hours Hospital">Pettai 24 Hours Hospital</option>
+        <option value="Panimalar Hospital">Panimalar Hospital</option>
+        <option value="S.S Hospital">S.S Hospital</option>
+        <option value="Mangalam Hospital">Mangalam Hospital</option>
+        <option value="Be Well Hospital">Be Well Hospital</option>
+        <option value="Government Hospital">Government Hospital</option>
+        <option value="Saveetha Hospital">Saveetha Hospital</option>
+        <option value="RMD Specialities Hospital">RMD Specialities Hospital</option>
+        <option value="Meenakshi Hospital">Meenakshi Hospital</option>
+      </select>
+      <select id="bloodAvailabilityFilter" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333;">
+        <option value="all">Availability: All</option>
+        <option value="available">Available (High Stock)</option>
+        <option value="limited">Limited Stock</option>
+        <option value="critical">Critical Need</option>
+        <option value="unavailable">Unavailable</option>
+      </select>
+      <button onclick="filterBloodAvailability()" style="padding: 8px 15px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Filter</button>
+      <button onclick="resetBloodFilter()" style="padding: 8px 15px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset</button>
+    </div>
+    <div id="bloodAvailabilityContainer"></div>
+  </div>
+
+  <!-- Bed Availability in Hospitals -->
+  <div class="container">
+    <h2>🛏️ Bed Availability in Hospitals</h2>
+    <p style="color: var(--muted); font-size: 14px;">Real-time bed availability across hospitals. Check ICU, General, Semi-Private & Private beds.</p>
+    <div style="margin-bottom: 15px; background-color: rgba(255,255,255,0.1); padding: 12px; border-radius: 5px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <select id="bedTypeFilter" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333;">
+        <option value="all">Bed Type: All</option>
+        <option value="ICU">ICU Beds</option>
+        <option value="General">General Ward</option>
+        <option value="Semi-Private">Semi-Private</option>
+        <option value="Private">Private</option>
+        <option value="Pediatric">Pediatric</option>
+        <option value="Maternity">Maternity</option>
+      </select>
+      <select id="bedHospitalFilter" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333;">
+        <option value="all">Hospital: All</option>
+        <option value="Hope Hospital">Hope Hospital</option>
+        <option value="Sri Balaji Medical and Hospital">Sri Balaji Medical and Hospital</option>
+        <option value="Pettai 24 Hours Hospital">Pettai 24 Hours Hospital</option>
+        <option value="Panimalar Hospital">Panimalar Hospital</option>
+        <option value="S.S Hospital">S.S Hospital</option>
+        <option value="Mangalam Hospital">Mangalam Hospital</option>
+        <option value="Be Well Hospital">Be Well Hospital</option>
+        <option value="Government Hospital">Government Hospital</option>
+        <option value="Saveetha Hospital">Saveetha Hospital</option>
+        <option value="RMD Specialities Hospital">RMD Specialities Hospital</option>
+        <option value="Meenakshi Hospital">Meenakshi Hospital</option>
+      </select>
+      <select id="bedStatusFilter" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333;">
+        <option value="all">Availability: All</option>
+        <option value="available">Available</option>
+        <option value="limited">Limited (1-2 beds)</option>
+        <option value="full">Full Occupancy</option>
+      </select>
+      <button onclick="filterBedAvailability()" style="padding: 8px 15px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Filter</button>
+      <button onclick="resetBedFilter()" style="padding: 8px 15px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset</button>
+    </div>
+    <div id="bedAvailabilityContainer"></div>
+  </div>
+
+  <div class="container">
+    <h2>Book an Appointment</h2>
+    <div style="margin-bottom: 15px; background-color: rgba(255,255,255,0.1); padding: 12px; border-radius: 5px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <select id="appointmentDept" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333; flex: 1;">
+        <option value="">Select Department</option>
+        <option value="cardiology">Cardiology</option>
+        <option value="general medicine">General Medicine</option>
+        <option value="pediatrics">Pediatrics</option>
+        <option value="orthopedic">Orthopedic</option>
+        <option value="gynecology">Gynecology & Obstetrics</option>
+        <option value="dentistry">Dentistry</option>
+        <option value="surgery">General Surgery</option>
+        <option value="ent">ENT</option>
+        <option value="dermatology">Dermatology</option>
+        <option value="neurology">Neurology</option>
+        <option value="emergency">Emergency Care</option>
+      </select>
+      <input type="text" id="hospitalSearchForm" placeholder="🔍 Search hospital..." style="padding: 8px 12px; border: none; border-radius: 5px; flex: 1;">
+      <button onclick="filterHospitalForm()" style="padding: 8px 15px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Search</button>
+      <button onclick="resetHospitalForm()" style="padding: 8px 15px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset</button>
+    </div>
+    <form>
+      <label for="name">Full Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="hospital">Select Hospital:</label>
+      <select id="hospital" name="hospital" required>
+        <option value="hope hospital clinic">Hope Hospital Clinic</option>
+        <option value="sri balaji medical and hospital">Sri Balaji Medical and Hospital</option>
+        <option value="pettai 24 hours hospital">Pettai 24 Hours Hospital</option>
+        <option value="panimalar hospital">Panimalar Hospital</option>
+        <option value="s.s hospital">S.S Hospital</option>
+        <option value="mangalam hospital">Mangalam Hospital</option>
+        <option value="be well hospital">Be Well Hospital</option>
+        <option value="government hospital">Government Hospital</option>
+        <option value="dr ramya's hospital">Dr Ramya's Hospital</option>
+        <option value="vasanthi hospital">Vasanthi Hospital</option>
+        <option value="nh hospital">NH Hospital</option>
+        <option value="sai nursing home">Sai Nursing Home</option>
+        <option value="saveetha hospital">Saveetha Hospital</option>
+        <option value="madha hospital">Madha Hospital</option>
+        <option value="carefree hospital">Carefree Hospital</option>
+        <option value="kanaga hospital">Kanaga Hospital</option>
+        <option value="rmd specialities hospital">RMD Specialities Hospital</option>
+        <option value="bestow hospital">Bestow Hospital</option>
+        <option value="sri sudharsanam hospital">Sri Sudharsanam Hospital</option>
+        <option value="meenakshi hospital">Meenakshi Hospital</option>
+      </select>
+
+      <label for="date">Preferred Date:</label>
+      <input type="date" id="date" name="date" required>
+
+      <label for="message">Reason for Appointment:</label>
+      <textarea id="message" name="message" rows="4"></textarea>
+
+      <button type="submit" style="color: black;">Book Appointment</button>
+    </form>
+  </div>
+
+  <!-- Blood Donation Appointment Section -->
+  <div class="container">
+    <h2>🩸 Book a Blood Donation Appointment</h2>
+    <p style="color: var(--muted); font-size: 14px;">Help save lives by donating blood! Your generous donation can help up to 3 people. Below 18 units of blood are imported from other centers.</p>
+    <div style="margin-bottom: 15px; background-color: rgba(255,255,255,0.1); padding: 12px; border-radius: 5px; display: flex; gap: 10px; flex-wrap: wrap;">
+      <select id="bloodTypeSearch" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333; flex: 1;">
+        <option value="">Select Blood Type</option>
+        <option value="O+">O+ (O Positive)</option>
+        <option value="O-">O- (O Negative)</option>
+        <option value="A+">A+ (A Positive)</option>
+        <option value="A-">A- (A Negative)</option>
+        <option value="B+">B+ (B Positive)</option>
+        <option value="B-">B- (B Negative)</option>
+        <option value="AB+">AB+ (AB Positive)</option>
+        <option value="AB-">AB- (AB Negative)</option>
+      </select>
+      <input type="text" id="donationHospitalSearch" placeholder="🔍 Search hospital..." style="padding: 8px 12px; border: none; border-radius: 5px; flex: 1;">
+      <button onclick="filterDonationHospitals()" style="padding: 8px 15px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Search</button>
+      <button onclick="resetDonationFilters()" style="padding: 8px 15px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset</button>
+    </div>
+    <form>
+      <fieldset style="border: 1px solid var(--accent); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+        <legend style="color: #000; font-weight: bold;">Donor Information</legend>
+        
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <li style="margin-bottom: 15px;">
+            <label for="donorName" style="color: #000; display: block; margin-bottom: 5px; font-weight: 500;">Full Name:</label>
+            <input type="text" id="donorName" name="donorName" placeholder="Enter your full name" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;" required>
+          </li>
+
+          <li style="margin-bottom: 15px;">
+            <label for="bloodTypeSelect" style="color: #000; display: block; margin-bottom: 5px; font-weight: 500;">Blood Type:</label>
+            <select id="bloodTypeSelect" name="bloodType" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;" required>
+              <option value="">Select your blood type</option>
+              <option value="O+">O+ (O Positive)</option>
+              <option value="O-">O- (O Negative)</option>
+              <option value="A+">A+ (A Positive)</option>
+              <option value="A-">A- (A Negative)</option>
+              <option value="B+">B+ (B Positive)</option>
+              <option value="B-">B- (B Negative)</option>
+              <option value="AB+">AB+ (AB Positive)</option>
+              <option value="AB-">AB- (AB Negative)</option>
+            </select>
+          </li>
+
+          <li style="margin-bottom: 15px;">
+            <label for="donorAge" style="color: #000; display: block; margin-bottom: 5px; font-weight: 500;">Age:</label>
+            <input type="number" id="donorAge" name="donorAge" min="18" max="65" placeholder="Between 18-65 years" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;" required>
+          </li>
+
+          <li style="margin-bottom: 15px;">
+            <label for="donorWeight" style="color: white; display: block; margin-bottom: 5px; font-weight: 500;">Weight (kg):</label>
+            <input type="number" id="donorWeight" name="donorWeight" min="45" step="0.5" placeholder="Minimum 45 kg" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;" required>
+          </li>
+
+          <li style="margin-bottom: 15px;">
+            <label for="donorEmail" style="color: white; display: block; margin-bottom: 5px; font-weight: 500;">Email Address:</label>
+            <input type="email" id="donorEmail" name="donorEmail" placeholder="your.email@example.com" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;" required>
+          </li>
+
+          <li style="margin-bottom: 0;">
+            <label for="donorPhone" style="color: white; display: block; margin-bottom: 5px; font-weight: 500;">Phone Number:</label>
+            <input type="tel" id="donorPhone" name="donorPhone" placeholder="+91 XXXXX XXXXX" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;" required>
+          </li>
+        </ul>
+      </fieldset>
+
+      <fieldset style="border: 1px solid var(--accent); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+        <legend style="color: rgb(23, 21, 21); font-weight: bold;">Health Screening</legend>
+        <li>
+        <div style="margin: 10px 0;">
+          <label style="display: flex; align-items: center; gap: 8px; margin: 10px 0; color: rgb(21, 19, 19);">
+            <input type="checkbox" name="healthCheck1" value="yes"> I am in good health and feel well today
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; margin: 10px 0; color: rgb(12, 11, 11);">
+            <input type="checkbox" name="healthCheck2" value="yes"> I have not taken any medications recently (except vitamins)
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; margin: 10px 0; color: rgb(28, 24, 24);">
+            <input type="checkbox" name="healthCheck3" value="yes"> I do not have cold, cough, or fever
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; margin: 10px 0; color: rgb(16, 14, 14);">
+            <input type="checkbox" name="healthCheck4" value="yes"> I have not donated blood in the last 3 months
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; margin: 10px 0; color: rgb(32, 28, 28);">
+            <input type="checkbox" name="healthCheck5" value="yes"> I am not pregnant or breastfeeding (if applicable)
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; margin: 10px 0; color: rgb(16, 14, 14);">
+            <input type="checkbox" name="healthCheck6" value="yes"> I have no history of chronic diseases (diabetes, hypertension, kidney disease)
+          </label>
+        </li>
+        </div>
+
+        <label for="medicalHistory" style="color: white; display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500;">Any Medical Conditions or Allergies:</label>
+        <textarea id="medicalHistory" name="medicalHistory" rows="3" placeholder="List any medical conditions, allergies, or medications you're taking..." style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;"></textarea>
+      </fieldset>
+
+      <fieldset style="border: 1px solid var(--accent); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+        <legend style="color: white; font-weight: bold;">Donation Details</legend>
+        
+        <label for="donationHospital" style="color: white; display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500;">Select Hospital:</label>
+        <select id="donationHospital" name="donationHospital" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+          <optgroup label="1 km away">
+            <option value="Hope Hospital">Hope Hospital</option>
+            <option value="Sri Balaji Medical and Hospital">Sri Balaji Medical and Hospital</option>
+          </optgroup>
+          <optgroup label="3-5 km away">
+            <option value="Pettai 24 Hours Hospital">Pettai 24 Hours Hospital</option>
+            <option value="Panimalar Hospital">Panimalar Hospital</option>
+            <option value="S.S Hospital">S.S Hospital</option>
+            <option value="Mangalam Hospital">Mangalam Hospital</option>
+            <option value="Be Well Hospital">Be Well Hospital</option>
+            <option value="Government Hospital">Government Hospital</option>
+          </optgroup>
+          <optgroup label="6+ km away">
+            <option value="Saveetha Hospital">Saveetha Hospital</option>
+            <option value="RMD Specialities Hospital">RMD Specialities Hospital</option>
+            <option value="Meenakshi Hospital">Meenakshi Hospital</option>
+          </optgroup>
+        </select>
+
+        <label for="donationDate" style="color: white; display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500;">Preferred Donation Date:</label>
+        <input type="date" id="donationDate" name="donationDate" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+
+        <label for="donationTime" style="color: white; display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500;">Preferred Time Slot:</label>
+        <select id="donationTime" name="donationTime" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+          <option value="">Select time slot</option>
+          <option value="08:00-09:00">08:00 AM - 09:00 AM</option>
+          <option value="09:00-10:00">09:00 AM - 10:00 AM</option>
+          <option value="10:00-11:00">10:00 AM - 11:00 AM</option>
+          <option value="11:00-12:00">11:00 AM - 12:00 PM</option>
+          <option value="12:00-13:00">12:00 PM - 01:00 PM</option>
+          <option value="14:00-15:00">02:00 PM - 03:00 PM</option>
+          <option value="15:00-16:00">03:00 PM - 04:00 PM</option>
+          <option value="16:00-17:00">04:00 PM - 05:00 PM</option>
+          <option value="17:00-18:00">05:00 PM - 06:00 PM</option>
+        </select>
+
+        <label for="donationFrequency" style="color: white; display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500;">How often have you donated before?</label>
+        <select id="donationFrequency" name="donationFrequency" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
+          <option value="">Select donation history</option>
+          <option value="first-time">First time donor</option>
+          <option value="1-2-times">1-2 times</option>
+          <option value="3-5-times">3-5 times</option>
+          <option value="regular">Regular donor (5+ times)</option>
+        </select>
+
+        <label for="donationReason" style="color: white; display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500;">Reason for Donation:</label>
+        <textarea id="donationReason" name="donationReason" rows="3" placeholder="Why do you want to donate? (Optional - helps us know your motivation)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;"></textarea>
+      </fieldset>
+
+      <div style="background: rgba(255, 193, 7, 0.1); border-left: 4px solid #f4f0f0; padding: 12px; border-radius: 5px; margin-bottom: 15px;">
+        <strong style="color: #df1616;">❗ Important:</strong>
+        <ul style="margin: 8px 0 0 0; padding-left: 20px; color: #003366;">
+          <li>Blood donation takes approximately 10-15 minutes</li>
+          <li>You will be observed for 10-15 minutes after donation</li>
+          <li>Drink plenty of fluids before and after donation</li>
+          <li>Avoid strenuous activities for 24 hours after donation</li>
+          <li>Your blood will be tested for various diseases before use</li>
+        </ul>
+      </div>
+
+      <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 15px; color: rgb(21, 15, 15);">
+        <input type="checkbox" name="agreeTerms" required> I agree to the Blood Donation Terms & Conditions
+      </label>
+
+      <button type="submit" style="background: #dc3545; padding: 12px 20px; font-size: 16px; font-weight: bold;">💉 Schedule Blood Donation</button>
+    </form>
+    
+    <div class="container" id="oxygen">
+      <h2>🫧Oxygen Cylinder Availability</h2>
+      <div style="margin-bottom: 15px; background-color: rgba(255,255,255,0.1); 
+              padding: 12px; border-radius: 5px; display: flex; gap: 10px; 
+              flex-wrap: wrap; align-items: center;">
+    
+        <select id="oxygenLocationFilter" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333;">
+          <option value="all">Location: All</option>
+          <option value="poonamallee">Poonamallee</option>
+          <option value="thiruvallur">Thiruvallur</option>
+          <option value="avadi">Avadi</option>
+          <option value="ambattur">Ambattur</option>
+          <option value="porur">Porur</option>
+          <option value="red hills">Red Hills</option>
+          <option value="kundrathur">Kundrathur</option>
+          <option value="mangadu">Mangadu</option>
+          <option value="thirumazhisai">Thirumazhisai</option>
+       </select>
+
+       <input type="text" id="oxygenSearch" placeholder="Search hospitals...">
+       <button onclick="filterDonationHospitals()" style="padding: 8px 15px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Search</button>
+       <button onclick="resetDonationFilters()" style="padding: 8px 15px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset</button>
+     </div>
+    </div>
+    <div id="oxygenAvailabilityContainer"></div>
+
+      <div class="oxygen-card" data-hospital="Hope Hospital" data-status="available">
+        <h3>Hope Hospital</h3>
+        <p>Location: Poonamallee</p>
+         <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Sri Balaji Medical" data-status="critical">
+        <h3>Sri Balaji Medical</h3>
+        <p>Location: Poonamallee</p>
+        <p>Status: <span class="indicator red">🔴 Critical Need</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Aachi Hospital" data-status="limited">
+        <h3>Aachi Hospital</h3>
+        <p>Location: Avadi</p>
+        <p>Status: <span class="indicator yellow">🟡 Limited Stock</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Pettai 24 Hours Hospital" data-status="available">
+        <h3>Pettai 24 Hours Hospital</h3>
+        <p>Location: Thiruvallur</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Panimalar Hospital" data-status="available">
+        <h3>Panimalar Hospital</h3>
+        <p>Location: Red Hills</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="S.S Hospital" data-status="limited">
+        <h3>S.S Hospital</h3>
+        <p>Location: Mangadu</p>
+        <p>Status: <span class="indicator yellow">🟡 Limited Stock</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Mangalam Hospital" data-status="available">
+        <h3>Mangalam Hospital</h3>
+        <p>Location: Avadi</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Be Well Hospital" data-status="available">
+        <h3>Be Well Hospital</h3>
+        <p>Location: Ambattur</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Government Hospital" data-status="available">
+        <h3>Government Hospital</h3>
+        <p>Location: Porur</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Dr.Ramya's Multi Speciality Hospital" data-status="limited">
+        <h3>Dr.Ramya's Multi Speciality Hospital</h3>
+        <p>Location: Kundrathur</p>
+        <p>Status: <span class="indicator yellow">🟡 Limited Stock</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Vasanthi Hospital" data-status="available">
+        <h3>Vasanthi Hospital</h3>
+        <p>Location: Mangadu</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="NH Hospital" data-status="available">
+        <h3>NH Hospital</h3>
+        <p>Location: Thirumazhisai</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Sai Nursing Home" data-status="limited">
+        <h3>Sai Nursing Home</h3>
+        <p>Location: Avadi</p>
+        <p>Status: <span class="indicator yellow">🟡 Limited Stock</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Saveetha Hospital" data-status="available">
+        <h3>Saveetha Hospital</h3>
+        <p>Location: Red Hills</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Madha Hospital" data-status="available">
+        <h3>Madha Hospital</h3>
+        <p>Location: Poonamallee</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Carewell Hospital" data-status="available">
+        <h3>Carewell Hospital</h3>
+        <p>Location: Avadi</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="kanaga multispeciality Hospital" data-status="available">
+        <h3>Kanaga Multispeciality Hospital</h3>
+        <p>Location: Thiruvallur</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="RMD Specialities Hospital" data-status="limited">
+        <h3>RMD Specialities Hospital</h3>
+        <p>Location: Thiruvallur</p>
+        <p>Status: <span class="indicator yellow">🟡 Limited Stock</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Bestow Hospital" data-status="available">
+        <h3>Bestow Hospital</h3>
+        <p>Location: Thiruvallur</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Sri Sudharsanam Hospital" data-status="available">
+        <h3>Sri Sudharsanam Hospital</h3>
+        <p>Location: Thiruvallur</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+      <div class="oxygen-card" data-hospital="Meenakshi Hospital" data-status="available">
+        <h3>Meenakshi Hospital</h3>
+        <p>Location: Kundrathur</p>
+        <p>Status: <span class="indicator green">🟢 Available</span></p>
+      </div>
+    </div>
+    <div class="container" id="veterinary">
+      <h2>🐾 Veterinary Hospitals in Thiruvallur</h2>
+      <div style="margin-bottom: 15px; background-color: rgba(255,255,255,0.1); 
+              padding: 12px; border-radius: 5px; display: flex; gap: 10px; 
+              flex-wrap: wrap; align-items: center;">
+    
+        <select id="vetLocationFilter" style="padding: 8px 12px; border: none; border-radius: 5px; color: #333;">
+          <option value="all">Location: All</option>
+          <option value="poonamallee">Poonamallee</option>
+          <option value="thiruvallur">Thiruvallur</option>
+          <option value="avadi">Avadi</option>
+          <option value="ambattur">Ambattur</option>
+          <option value="porur">Porur</option>
+          <option value="red hills">Red Hills</option>
+          <option value="kundrathur">Kundrathur</option>
+          <option value="mangadu">Mangadu</option>
+          <option value="thirumazhisai">Thirumazhisai</option>
+       </select>
+
+       <input type="text" id="vetSearch" placeholder="Search veterinary hospitals...">
+       <button onclick="filterVetHospitals()" style="padding: 8px 15px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">Search</button>
+       <button onclick="resetVetFilters()" style="padding: 8px 15px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset</button>
+
+      </div>
+
+     <div id="vetHospitalsContainer"></div>
+   </div>
+
+      <div class="hospital-card">
+        <h3>Amarambedu Government Veterinary Hospital</h3>
+        <p>Location: Avadi</p>
+        <p><a href="https://maps.app.goo.gl/1WHxGdVP2Q62THoV6?g_st=aw" target="_blank">📍Map</a></p>
+        <p>⏰ 9:00 AM – 12:00 PM(mon-sat)</p>
+        <p>⭐ Rating: 4.2</p>
+      </div>
+      <div class="hospital-card">
+        <h3>DR.Pet 24hours multi Speciality pet hospital</h3>
+        <p>Location: Thiruvallur</p>
+        <p><a href="https://maps.app.goo.gl/wdwhcKwg3vN3mvpk8?g_st=aw" target="_blank">📍Map</a></p>
+        <p>⏰ open 24 hours</p>
+        <p>⭐ Rating: 4.0</p>
+      </div>
+      <div class="hospital-card">
+        <h3>Sriram Pet clinic</h3>
+        <p>Location: Ambattur</p>
+        <p><a href="https://maps.app.goo.gl/NMvQvP7JEL8PuEEEA?g_st=aw" target="_blank">📍Map</a></p>
+        <p>⏰ 10:00 AM – 9:30 PM(mon-sat)</p>
+        <p>⭐ Rating: 4.5</p>
+      </div>
+      <div class="hospital-card">
+        <h3>Veterinary University Peripheral Hospital</h3>
+        <p>Location: Porur</p>
+        <p><a href="https://maps.app.goo.gl/RSm99BaXytf4RAVS9?g_st=aw" target="_blank">📍Map</a></p>
+        <p>⏰ 8:00 AM – 1:00 PM(mon-fri),8:00 AM – 11:30 AM(sat-sun)</p>
+        <p>⭐ University-run facility</p>
+      </div>
+      <div class="hospital-card">
+        <h3>Deivayanai pet clinic</h3>
+        <p>Location: Porur</p>
+        <p><a href="https://maps.app.goo.gl/6CRHAekMmkPdmSSy8?g_st=aw" target="_blank">📍Map</a></p>
+        <p>⏰ 9:00 AM – 2:00 PM,7:30PM–9:30PM(mon-sun)</p>
+        <p>⭐ Rating: 4.7</p>
+      </div>
+      <div class="hospital-card">
+        <h3>Nivi's Pet Clinic</h3>
+        <p>Location: Red Hills</p>
+        <p><a href="https://maps.app.goo.gl/kSNutREEGJmWyrJf9?g_st=aw" target="_blank">📍Map</a></p>
+        <p>⏰ 10:00 AM – 10:00 PM(mon-sat)</p>
+        <p>⭐ Rating: 4.9</p>
+      </div>
+      <div class="hospital-card">
+        <h3>Bairav Pet clinic</h3>
+        <p>Location: Kundrathur</p>
+        <p><a href="https://maps.app.goo.gl/MjfEAwLoN7FspqS88?g_st=aw" target="_blank">📍Map</a></p>
+        <p>⏰ 10:00AM-2:00PM,5:00PM-10:00PM(mon-sun)</p>
+        <p>⭐ Rating: 4.8</p>
+      </div>
+      <div class="hospital-card">
+        <h3>government veterinary hospital,Mangadu</h3>
+        <p>Location: Mangadu</p>
+        <p><a href="https://maps.app.goo.gl/Avvp6Pw8sR88w74B7?g_st=aw" target="_blank">📍Map</a></p>
+        <p>⏰ 10:00 AM – 12:00 PM,3:00PM-5:00PM(mon-sun)</p>
+        <p>⭐ Rating: 3.4</p>
+      </div>
+      <div class="hospital-card">
+        <h3>Veterinary Hospital Pallipattu</h3>
+        <p>Location:Thirumazhisai</p>
+        <p><a href="https://maps.app.goo.gl/A2x9UZGugQXzk8is9?g_st=aw" target="_blank">📍Map</a></p>
+        <p>⏰ 8:00 AM – 5:00 PM(mon-sun)</p>
+        <p>⭐ Rating: 3.9</p>
+      </div>
+      <div class="hospital-card">
+        <h3>JPL Pets</h3>
+        <p>Location: Poonamallee</p>
+        <p><a href="https://maps.app.goo.gl/hGRuzmASo4cZKrX27?g_st=aw" target="_blank">📍Map</a></p>
+        <p>⏰ 9:30 AM – 11:30 PM</p>
+        <p>⭐ Rating: 3.9</p>
+      </div>
+   </div>
+
+
+  </div>
+
+  <div id="chatbot-icon" onclick="toggleChat()">
+     <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="Chatbot Icon" width="60">
+  </div>
+
+  <div id="chatbot-intro" style="position:fixed;left:50%; top:60%; transform:translate(-50%,0); background:var(--chat-header); color:var(--text); padding:10px 20px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.15); z-index:10001; display:none; ">
+    Hi! I'm TAN, your smart-health assistant. Click the icon to clarify your queries with me!
+  </div>
+  
+
+  <div id="chatbot-box">
+    <div id="chat-header">
+      <span>Health Assistant</span>
+      <span id="chatLangWrap">
+        <select id="chatLangSelect" onchange="sihSetChatLanguage()" aria-label="Assistant language">
+          <option value="en-US">EN</option>
+          <option value="ta-IN">தமிழ்</option>
+          <option value="hi-IN">हिन्दी</option>
+        </select>
+        <button id="chatVoiceOutBtn" type="button" onclick="sihToggleVoiceOut()" title="Read replies aloud" aria-pressed="false">🔊</button>
+      </span>
+    </div>
+    <div id="chat-messages"></div>
+
+    <input type="text" id="user-input" placeholder="Ask about health..." />
+    <div class="button-row">
+    <button id="sendBtn" onclick="sendMessage()">Send</button>
+    <button id="micBtn" title="Speak">🎤</button>
+    <button id="refreshBtn" onclick="refreshChat()">Refresh</button>
+    </div>
+  </div>
+
+<style>
+
+#chatbot-icon{ 
+ position:fixed;
+ left:50%;
+ top:50%;
+ transform:translate(-50%,-50%);
+ width:70px;
+ height:70px;
+ background:#e6f2ff;
+ border-radius:50%;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ cursor:pointer;
+ box-shadow:0 4px 10px rgba(0,0,0,0.2);
+ z-index:10000;
+}
+
+#chatbot-icon.animate {
+    animation: moveToBottom 0.30s forwards;
+ }
+
+@keyframes moveToBottom{
+  from{
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+  }
+  to{
+    top:auto;
+    left:auto;
+    bottom:20px;
+    right:20px;
+    transform:none;
+  }
+}
+
+@keyframes floatIcon{
+  0%{transform:translateY(0);}
+  50%{transform:translateY(10px);}
+  100%{transform:translateY(0);}
+}
+
+
+#chatbot-box{
+ display:none;
+ position:fixed;
+ bottom:100px;
+ right:20px;
+ width:300px;
+ background:white;
+ border:1px solid #ccc;
+ border-radius:12px;
+ box-shadow:0 4px 10px rgba(0,0,0,0.2);
+ font-family:Arial;
+}
+
+
+
+#chat-header{
+ background:#2b7a78;
+ color:white;
+ padding:10px 12px;
+ border-radius:12px 12px 0 0;
+ font-weight:bold;
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:8px;
+}
+#chatLangWrap{ display:flex; align-items:center; gap:6px; }
+#chatLangSelect{
+ width:auto;
+ padding:3px 5px;
+ font-size:12px;
+ border-radius:6px;
+ border:none;
+ color:#0b2447;
+ background:#fff;
+}
+#chatVoiceOutBtn{
+ width:auto;
+ padding:3px 7px;
+ font-size:14px;
+ border-radius:6px;
+ background:rgba(255,255,255,.18);
+ opacity:.7;
+}
+#chatVoiceOutBtn[aria-pressed="true"]{
+ background:#fff;
+ color:#2b7a78;
+ opacity:1;
+}
+
+#chat-messages{
+ height:220px;
+ overflow-y:auto;
+ padding:10px;
+ font-size:14px;
+}
+
+/* Message bubble styles */
+.msg{
+  margin-bottom:8px;
+  display:flex;
+  flex-direction:column;
+}
+.msg-sender{font-size:12px; font-weight:600; margin-bottom:4px; color:#d5cece !important}
+.msg-text{background:#eef6ff; padding:8px 10px; border-radius:10px; max-width:85%; color:#0b0606 !important}
+.msg.user{align-items:flex-end}
+.msg.user .msg-text{background:#2b7a78; color:#000000 !important}
+.msg.bot{align-items:flex-start}
+
+#user-input{
+ width:65%;
+ padding:8px;
+ border:none;
+ border-top:1px solid #ccc;
+}
+
+button{
+ width:30%;
+ padding:8px;
+ background:#2b7a78;
+ color:white;
+ border:none;
+ cursor:pointer;
+}
+</style>
+
+<script>
+
+// Enhanced Doctor Database with Practo-like features
+const doctorsDatabase = [
+  {
+    id: 1,
+    name: "Dr. Pradeep",
+    specialty: "Cardiology",
+    hospital: "Saveetha Hospital",
+    qualification: "MD, DM Cardiology",
+    experience: 12,
+    rating: 4.8,
+    reviews: 342,
+    fee: 800,
+    availability: "Mon-Sun 10:00 AM to 1:00 PM",
+    consultation: ["In-clinic", "Video Call"],
+    about: "Senior Cardiologist with 12+ years of experience. Specializes in preventive cardiology and interventional procedures.",
+    achievements: ["Published 15+ Research Papers", "Member of Indian Heart Association", "Best Cardiologist Award 2024"],
+    languages: ["English", "Tamil", "Hindi"]
+  },
+  {
+    id: 2,
+    name: "Dr. Karthik",
+    specialty: "Cardiology",
+    hospital: "RMD Specialities Hospital",
+    qualification: "MD, DM Cardiology",
+    experience: 10,
+    rating: 4.7,
+    reviews: 298,
+    fee: 750,
+    availability: "Mon-Sun 9:00 AM to 12:00 PM",
+    consultation: ["In-clinic", "Video Call", "Phone Call"],
+    about: "Expert in cardiac imaging and coronary interventions.",
+    achievements: ["500+ Successful Angiograms", "Member of ESC", "Trainer for ACLS"],
+    languages: ["English", "Tamil", "Kannada"]
+  },
+  {
+    id: 3,
+    name: "Dr. S. Sundari",
+    specialty: "Pediatrics",
+    hospital: "Sri Balaji Medical and Hospital",
+    qualification: "MD Pediatrics, FIPAMS",
+    experience: 15,
+    rating: 4.9,
+    reviews: 425,
+    fee: 600,
+    availability: "Mon-Sat 8:00 AM to 4:00 PM",
+    consultation: ["In-clinic", "Video Call"],
+    about: "HOD of Pediatrics with expertise in neonatal care and child development.",
+    achievements: ["15+ Years Experience", "National Pediatric Society Member", "Renowned in Neonatal Care"],
+    languages: ["English", "Tamil", "Hindi", "Malayalam"]
+  },
+  {
+    id: 4,
+    name: "Dr. K. Vani",
+    specialty: "Gynecology",
+    hospital: "Sri Balaji Medical and Hospital",
+    qualification: "MD OB/GYN, FRCOG",
+    experience: 18,
+    rating: 4.9,
+    reviews: 567,
+    fee: 700,
+    availability: "Mon-Sat 8:00 AM to 3:00 PM",
+    consultation: ["In-clinic", "Video Call"],
+    about: "HOD of Gynecology. Expert in high-risk pregnancies and minimally invasive surgery.",
+    achievements: ["18+ Years Experience", "5000+ Safe Deliveries", "RCOG Certified"],
+    languages: ["English", "Tamil", "Hindi"]
+  },
+  {
+    id: 5,
+    name: "Dr. Harish",
+    specialty: "Orthopedic",
+    hospital: "NH Hospital",
+    qualification: "MS Orthopedics, Fellowship Sports Medicine",
+    experience: 11,
+    rating: 4.8,
+    reviews: 356,
+    fee: 650,
+    availability: "Mon-Sun 10:00 AM to 2:00 PM",
+    consultation: ["In-clinic", "Video Call"],
+    about: "Specialist in sports injuries, joint replacement, and arthroscopic surgery.",
+    achievements: ["Sports Medicine Specialist", "1000+ Joint Replacements", "Team Physician for State Sports"],
+    languages: ["English", "Tamil"]
+  },
+  {
+    id: 6,
+    name: "Dr. C. Karunanidhi",
+    specialty: "Dentistry",
+    hospital: "Aachi Hospital",
+    qualification: "BDS, MDS Conservative Dentistry",
+    experience: 9,
+    rating: 4.7,
+    reviews: 289,
+    fee: 500,
+    availability: "Daily 7:00 AM to 9:00 PM",
+    consultation: ["In-clinic", "Chat Consultation"],
+    about: "Expert in cosmetic dentistry and implantology with latest technology.",
+    achievements: ["ISO Certified Clinic", "Advanced Laser Dentistry", "Smile Makeover Specialist"],
+    languages: ["English", "Tamil", "Telugu"]
+  },
+  {
+    id: 7,
+    name: "Dr. M. Abid Saliya",
+    specialty: "Neurology",
+    hospital: "S.S Hospital",
+    qualification: "MD Neurology, Epilepsy Specialist",
+    experience: 16,
+    rating: 4.9,
+    reviews: 412,
+    fee: 800,
+    availability: "24 Hours",
+    consultation: ["In-clinic", "Phone Call"],
+    about: "Senior Neurologist with expertise in epilepsy, stroke management, and neurodegenerative diseases.",
+    achievements: ["16+ Years Experience", "Epilepsy Expert", "Published in International Journals"],
+    languages: ["English", "Tamil", "Urdu", "Hindi"]
+  },
+  {
+    id: 8,
+    name: "Dr. S. Ramesh Kumar",
+    specialty: "General Medicine",
+    hospital: "Mangalam Hospital",
+    qualification: "MD General Medicine, MRCP",
+    experience: 13,
+    rating: 4.8,
+    reviews: 378,
+    fee: 600,
+    availability: "24 Hours",
+    consultation: ["In-clinic", "Video Call", "Phone Call"],
+    about: "Skilled in managing acute and chronic diseases with personalized treatment plans.",
+    achievements: ["Infectious Disease Specialist", "CDE Certified", "Diabetes Management Expert"],
+    languages: ["English", "Tamil", "Hindi"]
+  }
+];
+
+// Lab Tests Database
+const labTests = [
+  {
+    id: 1,
+    name: "Complete Blood Count (CBC)",
+    price: 300,
+    time: "24 hours",
+    description: "Checks overall blood health",
+    includes: ["RBC", "WBC", "Platelets", "Hemoglobin"]
+  },
+  {
+    id: 2,
+    name: "Lipid Profile",
+    price: 500,
+    time: "24 hours",
+    description: "Checks cholesterol and triglycerides",
+    includes: ["Total Cholesterol", "HDL", "LDL", "Triglycerides"]
+  },
+  {
+    id: 3,
+    name: "Thyroid Profile (TSH, T3, T4)",
+    price: 800,
+    time: "24 hours",
+    description: "Evaluates thyroid function",
+    includes: ["TSH", "Free T3", "Free T4"]
+  },
+  {
+    id: 4,
+    name: "Blood Sugar Fasting",
+    price: 250,
+    time: "Same Day",
+    description: "Checks fasting glucose levels",
+    includes: ["Fasting Blood Sugar"]
+  },
+  {
+    id: 5,
+    name: "COVID-19 RT-PCR Test",
+    price: 600,
+    time: "24 hours",
+    description: "Confirms COVID-19 infection",
+    includes: ["RT-PCR Test", "Report"]
+  },
+  {
+    id: 6,
+    name: "Liver Function Test (LFT)",
+    price: 600,
+    time: "24 hours",
+    description: "Assesses liver health",
+    includes: ["ALT", "AST", "Bilirubin", "Albumin"]
+  },
+  {
+    id: 7,
+    name: "Kidney Function Test (KFT)",
+    price: 500,
+    time: "24 hours",
+    description: "Checks kidney function",
+    includes: ["Creatinine", "BUN", "Potassium"]
+  },
+  {
+    id: 8,
+    name: "Full Body Checkup",
+    price: 2500,
+    time: "2-3 days",
+    description: "Comprehensive health screening",
+    includes: ["CBC", "Lipid Profile", "Thyroid", "Liver/Kidney Tests", "Blood Sugar"]
+  }
+];
+
+// Sample Reviews and Ratings
+const reviews = [
+  { doctor: "Dr. Pradeep", rating: 5, text: "Excellent doctor! Very thorough and caring. Explained everything clearly.", author: "Rajesh M." },
+  { doctor: "Dr. Pradeep", rating: 4, text: "Good consultation. Though waiting time was a bit long.", author: "Priya S." },
+  { doctor: "Dr. S. Sundari", rating: 5, text: "Amazing pediatrician! My child loves her. Very patient and experienced.", author: "Anjali K." },
+  { doctor: "Dr. K. Vani", rating: 5, text: "Best gynecologist in the city. Highly recommended for pregnancy care!", author: "Divya R." },
+  { doctor: "Dr. Harish", rating: 5, text: "Treated my knee injury perfectly. Back to sports in 3 weeks!", author: "Vikram P." },
+  { doctor: "Dr. C. Karunanidhi", rating: 4, text: "Professional dentist with modern equipment. Painless treatment.", author: "Suresh L." },
+];
+
+// Blood Availability Database
+const bloodAvailabilityDatabase = [
+  {
+    hospital: "Hope Hospital",
+    phone: "9445022257",
+    bloodTypes: {
+      "O+": { units: 45, status: "available", lastUpdated: "Today 2:30 PM" },
+      "O-": { units: 8, status: "limited", lastUpdated: "Today 2:30 PM" },
+      "A+": { units: 32, status: "available", lastUpdated: "Today 2:30 PM" },
+      "A-": { units: 5, status: "limited", lastUpdated: "Today 2:30 PM" },
+      "B+": { units: 28, status: "available", lastUpdated: "Today 2:30 PM" },
+      "B-": { units: 3, status: "critical", lastUpdated: "Today 2:30 PM" },
+      "AB+": { units: 18, status: "available", lastUpdated: "Today 2:30 PM" },
+      "AB-": { units: 2, status: "critical", lastUpdated: "Today 2:30 PM" }
+    },
+    distance: "1.0 km"
+  },
+  {
+    hospital: "Sri Balaji Medical and Hospital",
+    phone: "7871767969",
+    bloodTypes: {
+      "O+": { units: 52, status: "available", lastUpdated: "Today 3:15 PM" },
+      "O-": { units: 12, status: "limited", lastUpdated: "Today 3:15 PM" },
+      "A+": { units: 38, status: "available", lastUpdated: "Today 3:15 PM" },
+      "A-": { units: 4, status: "critical", lastUpdated: "Today 3:15 PM" },
+      "B+": { units: 35, status: "available", lastUpdated: "Today 3:15 PM" },
+      "B-": { units: 1, status: "critical", lastUpdated: "Today 3:15 PM" },
+      "AB+": { units: 22, status: "available", lastUpdated: "Today 3:15 PM" },
+      "AB-": { units: 0, status: "unavailable", lastUpdated: "Today 3:15 PM" }
+    },
+    distance: "1.0 km"
+  },
+  {
+    hospital: "Pettai 24 Hours Hospital",
+    phone: "9025111378",
+    bloodTypes: {
+      "O+": { units: 48, status: "available", lastUpdated: "Today 4:00 PM" },
+      "O-": { units: 6, status: "limited", lastUpdated: "Today 4:00 PM" },
+      "A+": { units: 35, status: "available", lastUpdated: "Today 4:00 PM" },
+      "A-": { units: 2, status: "critical", lastUpdated: "Today 4:00 PM" },
+      "B+": { units: 30, status: "available", lastUpdated: "Today 4:00 PM" },
+      "B-": { units: 4, status: "limited", lastUpdated: "Today 4:00 PM" },
+      "AB+": { units: 20, status: "available", lastUpdated: "Today 4:00 PM" },
+      "AB-": { units: 1, status: "critical", lastUpdated: "Today 4:00 PM" }
+    },
+    distance: "3.02 km"
+  },
+  {
+    hospital: "Panimalar Hospital",
+    phone: "044-283820",
+    bloodTypes: {
+      "O+": { units: 60, status: "available", lastUpdated: "Today 1:45 PM" },
+      "O-": { units: 15, status: "available", lastUpdated: "Today 1:45 PM" },
+      "A+": { units: 42, status: "available", lastUpdated: "Today 1:45 PM" },
+      "A-": { units: 8, status: "limited", lastUpdated: "Today 1:45 PM" },
+      "B+": { units: 38, status: "available", lastUpdated: "Today 1:45 PM" },
+      "B-": { units: 5, status: "limited", lastUpdated: "Today 1:45 PM" },
+      "AB+": { units: 25, status: "available", lastUpdated: "Today 1:45 PM" },
+      "AB-": { units: 3, status: "limited", lastUpdated: "Today 1:45 PM" }
+    },
+    distance: "3.02 km"
+  },
+  {
+    hospital: "S.S Hospital",
+    phone: "8939651516",
+    bloodTypes: {
+      "O+": { units: 55, status: "available", lastUpdated: "Today 2:00 PM" },
+      "O-": { units: 10, status: "limited", lastUpdated: "Today 2:00 PM" },
+      "A+": { units: 40, status: "available", lastUpdated: "Today 2:00 PM" },
+      "A-": { units: 6, status: "limited", lastUpdated: "Today 2:00 PM" },
+      "B+": { units: 33, status: "available", lastUpdated: "Today 2:00 PM" },
+      "B-": { units: 2, status: "critical", lastUpdated: "Today 2:00 PM" },
+      "AB+": { units: 21, status: "available", lastUpdated: "Today 2:00 PM" },
+      "AB-": { units: 0, status: "unavailable", lastUpdated: "Today 2:00 PM" }
+    },
+    distance: "3.02 km"
+  },
+  {
+    hospital: "Mangalam Hospital",
+    phone: "044-26495599",
+    bloodTypes: {
+      "O+": { units: 50, status: "available", lastUpdated: "Today 3:30 PM" },
+      "O-": { units: 7, status: "limited", lastUpdated: "Today 3:30 PM" },
+      "A+": { units: 37, status: "available", lastUpdated: "Today 3:30 PM" },
+      "A-": { units: 3, status: "critical", lastUpdated: "Today 3:30 PM" },
+      "B+": { units: 29, status: "available", lastUpdated: "Today 3:30 PM" },
+      "B-": { units: 0, status: "unavailable", lastUpdated: "Today 3:30 PM" },
+      "AB+": { units: 19, status: "available", lastUpdated: "Today 3:30 PM" },
+      "AB-": { units: 1, status: "critical", lastUpdated: "Today 3:30 PM" }
+    },
+    distance: "4.08 km"
+  },
+  {
+    hospital: "Be Well Hospital",
+    phone: "9698300300",
+    bloodTypes: {
+      "O+": { units: 46, status: "available", lastUpdated: "Today 2:45 PM" },
+      "O-": { units: 9, status: "limited", lastUpdated: "Today 2:45 PM" },
+      "A+": { units: 34, status: "available", lastUpdated: "Today 2:45 PM" },
+      "A-": { units: 5, status: "limited", lastUpdated: "Today 2:45 PM" },
+      "B+": { units: 27, status: "available", lastUpdated: "Today 2:45 PM" },
+      "B-": { units: 0, status: "unavailable", lastUpdated: "Today 2:45 PM" },
+      "AB+": { units: 17, status: "available", lastUpdated: "Today 2:45 PM" },
+      "AB-": { units: 2, status: "critical", lastUpdated: "Today 2:45 PM" }
+    },
+    distance: "5.01 km"
+  },
+  {
+    hospital: "Government Hospital",
+    phone: "7402723402",
+    bloodTypes: {
+      "O+": { units: 58, status: "available", lastUpdated: "Today 3:00 PM" },
+      "O-": { units: 11, status: "limited", lastUpdated: "Today 3:00 PM" },
+      "A+": { units: 41, status: "available", lastUpdated: "Today 3:00 PM" },
+      "A-": { units: 7, status: "limited", lastUpdated: "Today 3:00 PM" },
+      "B+": { units: 36, status: "available", lastUpdated: "Today 3:00 PM" },
+      "B-": { units: 3, status: "limited", lastUpdated: "Today 3:00 PM" },
+      "AB+": { units: 24, status: "available", lastUpdated: "Today 3:00 PM" },
+      "AB-": { units: 1, status: "critical", lastUpdated: "Today 3:00 PM" }
+    },
+    distance: "5.02 km"
+  },
+  {
+    hospital: "Saveetha Hospital",
+    phone: "044-66726618",
+    bloodTypes: {
+      "O+": { units: 62, status: "available", lastUpdated: "Today 1:30 PM" },
+      "O-": { units: 14, status: "available", lastUpdated: "Today 1:30 PM" },
+      "A+": { units: 44, status: "available", lastUpdated: "Today 1:30 PM" },
+      "A-": { units: 9, status: "limited", lastUpdated: "Today 1:30 PM" },
+      "B+": { units: 40, status: "available", lastUpdated: "Today 1:30 PM" },
+      "B-": { units: 6, status: "limited", lastUpdated: "Today 1:30 PM" },
+      "AB+": { units: 26, status: "available", lastUpdated: "Today 1:30 PM" },
+      "AB-": { units: 4, status: "limited", lastUpdated: "Today 1:30 PM" }
+    },
+    distance: "6-7 km"
+  },
+  {
+    hospital: "RMD Specialities Hospital",
+    phone: "9444411219",
+    bloodTypes: {
+      "O+": { units: 51, status: "available", lastUpdated: "Today 2:15 PM" },
+      "O-": { units: 8, status: "limited", lastUpdated: "Today 2:15 PM" },
+      "A+": { units: 36, status: "available", lastUpdated: "Today 2:15 PM" },
+      "A-": { units: 4, status: "critical", lastUpdated: "Today 2:15 PM" },
+      "B+": { units: 31, status: "available", lastUpdated: "Today 2:15 PM" },
+      "B-": { units: 2, status: "critical", lastUpdated: "Today 2:15 PM" },
+      "AB+": { units: 20, status: "available", lastUpdated: "Today 2:15 PM" },
+      "AB-": { units: 0, status: "unavailable", lastUpdated: "Today 2:15 PM" }
+    },
+    distance: "8.03 km"
+  },
+  {
+    hospital: "Meenakshi Hospital",
+    phone: "044-42866621",
+    bloodTypes: {
+      "O+": { units: 53, status: "available", lastUpdated: "Today 3:45 PM" },
+      "O-": { units: 11, status: "limited", lastUpdated: "Today 3:45 PM" },
+      "A+": { units: 39, status: "available", lastUpdated: "Today 3:45 PM" },
+      "A-": { units: 6, status: "limited", lastUpdated: "Today 3:45 PM" },
+      "B+": { units: 34, status: "available", lastUpdated: "Today 3:45 PM" },
+      "B-": { units: 1, status: "critical", lastUpdated: "Today 3:45 PM" },
+      "AB+": { units: 23, status: "available", lastUpdated: "Today 3:45 PM" },
+      "AB-": { units: 3, status: "limited", lastUpdated: "Today 3:45 PM" }
+    },
+    distance: "10.02 km"
+  }
+];
+
+// Bed Availability Database
+const bedAvailabilityDatabase = [
+  {
+    hospital: "Hope Hospital",
+    phone: "9445022257",
+    totalBeds: 180,
+    beds: {
+      "ICU": { available: 4, total: 12, price: "₹8,000/day", status: "limited", lastUpdated: "Today 2:45 PM" },
+      "General": { available: 12, total: 45, price: "₹2,500/day", status: "available", lastUpdated: "Today 2:45 PM" },
+      "Semi-Private": { available: 6, total: 30, price: "₹4,500/day", status: "available", lastUpdated: "Today 2:45 PM" },
+      "Private": { available: 3, total: 25, price: "₹7,000/day", status: "limited", lastUpdated: "Today 2:45 PM" },
+      "Pediatric": { available: 8, total: 20, price: "₹3,000/day", status: "available", lastUpdated: "Today 2:45 PM" },
+      "Maternity": { available: 5, total: 15, price: "₹5,000/day", status: "available", lastUpdated: "Today 2:45 PM" }
+    },
+    distance: "1.0 km",
+    occupancyRate: "62%"
+  },
+  {
+    hospital: "Sri Balaji Medical and Hospital",
+    phone: "7871767969",
+    totalBeds: 220,
+    beds: {
+      "ICU": { available: 6, total: 15, price: "₹8,500/day", status: "available", lastUpdated: "Today 3:15 PM" },
+      "General": { available: 18, total: 60, price: "₹2,800/day", status: "available", lastUpdated: "Today 3:15 PM" },
+      "Semi-Private": { available: 8, total: 40, price: "₹4,800/day", status: "available", lastUpdated: "Today 3:15 PM" },
+      "Private": { available: 5, total: 35, price: "₹7,500/day", status: "available", lastUpdated: "Today 3:15 PM" },
+      "Pediatric": { available: 10, total: 25, price: "₹3,200/day", status: "available", lastUpdated: "Today 3:15 PM" },
+      "Maternity": { available: 3, total: 20, price: "₹5,500/day", status: "limited", lastUpdated: "Today 3:15 PM" }
+    },
+    distance: "1.0 km",
+    occupancyRate: "58%"
+  },
+  {
+    hospital: "Pettai 24 Hours Hospital",
+    phone: "9025111378",
+    totalBeds: 150,
+    beds: {
+      "ICU": { available: 2, total: 10, price: "₹7,500/day", status: "limited", lastUpdated: "Today 4:00 PM" },
+      "General": { available: 8, total: 50, price: "₹2,000/day", status: "available", lastUpdated: "Today 4:00 PM" },
+      "Semi-Private": { available: 4, total: 25, price: "₹3,800/day", status: "available", lastUpdated: "Today 4:00 PM" },
+      "Private": { available: 2, total: 20, price: "₹6,000/day", status: "limited", lastUpdated: "Today 4:00 PM" },
+      "Pediatric": { available: 6, total: 18, price: "₹2,500/day", status: "available", lastUpdated: "Today 4:00 PM" },
+      "Maternity": { available: 0, total: 12, price: "₹4,500/day", status: "full", lastUpdated: "Today 4:00 PM" }
+    },
+    distance: "3.02 km",
+    occupancyRate: "71%"
+  },
+  {
+    hospital: "Panimalar Hospital",
+    phone: "044-283820",
+    totalBeds: 280,
+    beds: {
+      "ICU": { available: 8, total: 20, price: "₹9,000/day", status: "available", lastUpdated: "Today 1:45 PM" },
+      "General": { available: 22, total: 80, price: "₹3,200/day", status: "available", lastUpdated: "Today 1:45 PM" },
+      "Semi-Private": { available: 12, total: 50, price: "₹5,200/day", status: "available", lastUpdated: "Today 1:45 PM" },
+      "Private": { available: 8, total: 40, price: "₹8,000/day", status: "available", lastUpdated: "Today 1:45 PM" },
+      "Pediatric": { available: 14, total: 35, price: "₹3,800/day", status: "available", lastUpdated: "Today 1:45 PM" },
+      "Maternity": { available: 6, total: 25, price: "₹6,000/day", status: "available", lastUpdated: "Today 1:45 PM" }
+    },
+    distance: "3.02 km",
+    occupancyRate: "52%"
+  },
+  {
+    hospital: "S.S Hospital",
+    phone: "8939651516",
+    totalBeds: 160,
+    beds: {
+      "ICU": { available: 5, total: 12, price: "₹8,200/day", status: "available", lastUpdated: "Today 2:00 PM" },
+      "General": { available: 14, total: 55, price: "₹2,700/day", status: "available", lastUpdated: "Today 2:00 PM" },
+      "Semi-Private": { available: 7, total: 32, price: "₹4,700/day", status: "available", lastUpdated: "Today 2:00 PM" },
+      "Private": { available: 1, total: 22, price: "₹6,800/day", status: "limited", lastUpdated: "Today 2:00 PM" },
+      "Pediatric": { available: 9, total: 20, price: "₹2,900/day", status: "available", lastUpdated: "Today 2:00 PM" },
+      "Maternity": { available: 4, total: 17, price: "₹5,200/day", status: "available", lastUpdated: "Today 2:00 PM" }
+    },
+    distance: "3.02 km",
+    occupancyRate: "61%"
+  },
+  {
+    hospital: "Mangalam Hospital",
+    phone: "044-26495599",
+    totalBeds: 140,
+    beds: {
+      "ICU": { available: 3, total: 10, price: "₹7,800/day", status: "limited", lastUpdated: "Today 3:30 PM" },
+      "General": { available: 10, total: 48, price: "₹2,400/day", status: "available", lastUpdated: "Today 3:30 PM" },
+      "Semi-Private": { available: 5, total: 28, price: "₹4,200/day", status: "available", lastUpdated: "Today 3:30 PM" },
+      "Private": { available: 0, total: 18, price: "₹6,500/day", status: "full", lastUpdated: "Today 3:30 PM" },
+      "Pediatric": { available: 7, total: 16, price: "₹2,700/day", status: "available", lastUpdated: "Today 3:30 PM" },
+      "Maternity": { available: 2, total: 12, price: "₹4,800/day", status: "limited", lastUpdated: "Today 3:30 PM" }
+    },
+    distance: "4.08 km",
+    occupancyRate: "68%"
+  },
+  {
+    hospital: "Be Well Hospital",
+    phone: "9698300300",
+    totalBeds: 120,
+    beds: {
+      "ICU": { available: 2, total: 8, price: "₹7,500/day", status: "limited", lastUpdated: "Today 2:45 PM" },
+      "General": { available: 6, total: 40, price: "₹2,200/day", status: "available", lastUpdated: "Today 2:45 PM" },
+      "Semi-Private": { available: 3, total: 22, price: "₹3,800/day", status: "limited", lastUpdated: "Today 2:45 PM" },
+      "Private": { available: 2, total: 20, price: "₹6,200/day", status: "limited", lastUpdated: "Today 2:45 PM" },
+      "Pediatric": { available: 5, total: 14, price: "₹2,500/day", status: "available", lastUpdated: "Today 2:45 PM" },
+      "Maternity": { available: 1, total: 10, price: "₹4,500/day", status: "limited", lastUpdated: "Today 2:45 PM" }
+    },
+    distance: "5.01 km",
+    occupancyRate: "74%"
+  },
+  {
+    hospital: "Government Hospital",
+    phone: "7402723402",
+    totalBeds: 300,
+    beds: {
+      "ICU": { available: 10, total: 25, price: "₹1,500/day", status: "available", lastUpdated: "Today 3:00 PM" },
+      "General": { available: 35, total: 120, price: "₹500/day", status: "available", lastUpdated: "Today 3:00 PM" },
+      "Semi-Private": { available: 16, total: 60, price: "₹1,800/day", status: "available", lastUpdated: "Today 3:00 PM" },
+      "Private": { available: 10, total: 50, price: "₹3,500/day", status: "available", lastUpdated: "Today 3:00 PM" },
+      "Pediatric": { available: 18, total: 30, price: "₹1,000/day", status: "available", lastUpdated: "Today 3:00 PM" },
+      "Maternity": { available: 8, total: 25, price: "₹2,000/day", status: "available", lastUpdated: "Today 3:00 PM" }
+    },
+    distance: "5.02 km",
+    occupancyRate: "46%"
+  },
+  {
+    hospital: "Saveetha Hospital",
+    phone: "044-66726618",
+    totalBeds: 320,
+    beds: {
+      "ICU": { available: 12, total: 25, price: "₹9,500/day", status: "available", lastUpdated: "Today 1:30 PM" },
+      "General": { available: 38, total: 100, price: "₹3,500/day", status: "available", lastUpdated: "Today 1:30 PM" },
+      "Semi-Private": { available: 20, total: 70, price: "₹5,800/day", status: "available", lastUpdated: "Today 1:30 PM" },
+      "Private": { available: 14, total: 60, price: "₹8,500/day", status: "available", lastUpdated: "Today 1:30 PM" },
+      "Pediatric": { available: 16, total: 40, price: "₹4,000/day", status: "available", lastUpdated: "Today 1:30 PM" },
+      "Maternity": { available: 10, total: 30, price: "₹6,500/day", status: "available", lastUpdated: "Today 1:30 PM" }
+    },
+    distance: "6-7 km",
+    occupancyRate: "48%"
+  },
+  {
+    hospital: "RMD Specialities Hospital",
+    phone: "9444411219",
+    totalBeds: 190,
+    beds: {
+      "ICU": { available: 6, total: 16, price: "₹8,800/day", status: "available", lastUpdated: "Today 2:15 PM" },
+      "General": { available: 16, total: 60, price: "₹3,000/day", status: "available", lastUpdated: "Today 2:15 PM" },
+      "Semi-Private": { available: 9, total: 40, price: "₹5,000/day", status: "available", lastUpdated: "Today 2:15 PM" },
+      "Private": { available: 4, total: 32, price: "₹7,800/day", status: "available", lastUpdated: "Today 2:15 PM" },
+      "Pediatric": { available: 11, total: 28, price: "₹3,500/day", status: "available", lastUpdated: "Today 2:15 PM" },
+      "Maternity": { available: 5, total: 18, price: "₹5,800/day", status: "available", lastUpdated: "Today 2:15 PM" }
+    },
+    distance: "8.03 km",
+    occupancyRate: "54%"
+  },
+  {
+    hospital: "Meenakshi Hospital",
+    phone: "044-42866621",
+    totalBeds: 200,
+    beds: {
+      "ICU": { available: 7, total: 18, price: "₹8,500/day", status: "available", lastUpdated: "Today 3:45 PM" },
+      "General": { available: 19, total: 70, price: "₹2,900/day", status: "available", lastUpdated: "Today 3:45 PM" },
+      "Semi-Private": { available: 11, total: 45, price: "₹4,900/day", status: "available", lastUpdated: "Today 3:45 PM" },
+      "Private": { available: 6, total: 38, price: "₹7,200/day", status: "available", lastUpdated: "Today 3:45 PM" },
+      "Pediatric": { available: 12, total: 22, price: "₹3,300/day", status: "available", lastUpdated: "Today 3:45 PM" },
+      "Maternity": { available: 7, total: 20, price: "₹5,400/day", status: "available", lastUpdated: "Today 3:45 PM" }
+    },
+    distance: "10.02 km",
+    occupancyRate: "57%"
+  }
+];
+
+// Filter hospitals by search and distance
+function filterHospitals() {
+  const searchText = document.getElementById('hospitalSearch').value.toLowerCase();
+  const category = document.getElementById('hospitalCategory').value.toLowerCase();
+  const minDist = parseFloat(document.getElementById('minDistance').value) || 0;
+  const maxDist = parseFloat(document.getElementById('maxDistance').value) || 999;
+  
+  const hospitalList = document.getElementById('hospitalList');
+  const items = hospitalList.getElementsByTagName('li');
+
+  let visibleCount = 0;
+  for (let item of items) {
+    const hospitalName = item.querySelector('strong').textContent.toLowerCase();
+    const distanceMatch = item.textContent.match(/([\d.]+)\s*km away/);
+    const distance = distanceMatch ? parseFloat(distanceMatch[1]) : 999;
+    
+    const matchesSearch = searchText === '' || hospitalName.includes(searchText); 
+    const matchesDistance = distance >= minDist && distance <= maxDist;
+    const matchesCategory = category === 'all' || 
+      (category === 'multispeciality' && hospitalName.includes('multi')) ||
+      (category === 'nursing' && hospitalName.includes('nursing')) ||
+      (category === 'medical college' && hospitalName.includes('medical college')) ||
+      (category === 'general' && !hospitalName.includes('nursing') && !hospitalName.includes('medical college'));
+    
+    if (matchesSearch && matchesDistance && matchesCategory) {
+      item.style.display = '';
+      visibleCount++;
+    } else {
+      item.style.display = 'none';
+    }
+  }
+}
+
+// Reset hospital filters
+function resetHospitals() {
+  document.getElementById('hospitalCategory').value = 'all';
+  document.getElementById('hospitalSearch').value = '';
+  document.getElementById('minDistance').value = '';
+  document.getElementById('maxDistance').value = '';
+  
+  const hospitalList = document.getElementById('hospitalList');
+  const items = hospitalList.getElementsByTagName('li');
+  for (let item of items) {
+    item.style.display = '';
+  }
+}
+
+// Filter doctors
+function filterDoctors() {
+  const searchText = document.getElementById('doctorSearch').value.toLowerCase();
+  const speciality = document.getElementById('specialityFilter').value.toLowerCase();
+  const container = document.getElementById('doctorSchedulesContainer');
+  const schedules = container.getElementsByClassName('hospital-schedule');
+  
+  let visibleCount = 0;
+  for (let schedule of schedules) {
+    const text = schedule.textContent.toLowerCase();
+    const matchesSearch = searchText === '' || text.includes(searchText);
+    const matchesSpeciality = speciality === 'all' || text.includes(speciality);
+    
+    if (matchesSearch && matchesSpeciality) {
+      schedule.style.display = '';
+      visibleCount++;
+    } else {
+      schedule.style.display = 'none';
+    }
+  }
+}
+
+// Reset doctor filters
+function resetDoctors() {
+  document.getElementById('specialityFilter').value = 'all';
+  document.getElementById('doctorSearch').value = '';
+  const container = document.getElementById('doctorSchedulesContainer');
+  const schedules = container.getElementsByClassName('hospital-schedule');
+  for (let schedule of schedules) {
+    schedule.style.display = '';
+  }
+}
+
+// Display Blood Availability
+function displayBloodAvailability() {
+  const container = document.getElementById('bloodAvailabilityContainer');
+  container.innerHTML = '';
+  
+  bloodAvailabilityDatabase.forEach(hospital => {
+    const hospitalDiv = document.createElement('div');
+    hospitalDiv.className = 'blood-hospital-card';
+    hospitalDiv.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+          <h3 style="margin: 0 0 5px 0; color: var(--highlight);">${hospital.hospital}</h3>
+          <p style="margin: 0; font-size: 14px; color: var(--muted);">📞 ${hospital.phone} | 📍 ${hospital.distance}</p>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 15px;">
+        ${Object.entries(hospital.bloodTypes).map(([type, data]) => {
+          const statusColor = data.status === 'available' ? '#28a745' : 
+                             data.status === 'limited' ? '#ffc107' : 
+                             data.status === 'critical' ? '#dc3545' : '#999';
+          const statusIcon = data.status === 'available' ? '✓' : 
+                            data.status === 'limited' ? '!' : 
+                            data.status === 'critical' ? '‼' : '✗';
+          const units = data.units > 0 ? `${data.units} units` : 'Out of Stock';
+          
+          return `
+            <div style="border: 1px solid ${statusColor}; border-radius: 5px; padding: 10px; text-align: center; background: rgba(${statusColor === '#28a745' ? '40,167,69' : statusColor === '#ffc107' ? '255,193,7' : statusColor === '#dc3545' ? '220,53,69' : '153,153,153'},0.1);">
+              <div style="font-weight: bold; font-size: 16px; color: ${statusColor};">${type}</div>
+              <div style="font-size: 12px; margin-top: 5px;">${statusIcon} ${units}</div>
+              <div style="font-size: 11px; color: var(--muted); margin-top: 3px;">${data.lastUpdated}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+    container.appendChild(hospitalDiv);
+  });
+}
+
+// Filter Blood Availability
+function filterBloodAvailability() {
+  const bloodType = document.getElementById('bloodTypeFilter').value;
+  const hospital = document.getElementById('bloodHospitalFilter').value;
+  const availability = document.getElementById('bloodAvailabilityFilter').value;
+  
+  const container = document.getElementById('bloodAvailabilityContainer');
+  container.innerHTML = '';
+  
+  let filtered = bloodAvailabilityDatabase;
+  
+  if (hospital !== 'all') {
+    filtered = filtered.filter(h => h.hospital === hospital);
+  }
+  
+  filtered.forEach(hosp => {
+    let hasMatchingBlood = false;
+    let filteredBloodTypes = {};
+    
+    Object.entries(hosp.bloodTypes).forEach(([type, data]) => {
+      let matches = true;
+      
+      if (bloodType !== 'all' && type !== bloodType) matches = false;
+      if (availability !== 'all' && data.status !== availability) matches = false;
+      
+      if (matches) {
+        hasMatchingBlood = true;
+        filteredBloodTypes[type] = data;
+      }
+    });
+    
+    if (hasMatchingBlood) {
+      const hospitalDiv = document.createElement('div');
+      hospitalDiv.className = 'blood-hospital-card';
+      hospitalDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div>
+            <h3 style="margin: 0 0 5px 0; color: var(--highlight);">${hosp.hospital}</h3>
+            <p style="margin: 0; font-size: 14px; color: var(--muted);">📞 ${hosp.phone} | 📍 ${hosp.distance}</p>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 15px;">
+          ${Object.entries(filteredBloodTypes).map(([type, data]) => {
+            const statusColor = data.status === 'available' ? '#28a745' : 
+                               data.status === 'limited' ? '#ffc107' : 
+                               data.status === 'critical' ? '#dc3545' : '#999';
+            const statusIcon = data.status === 'available' ? '✓' : 
+                              data.status === 'limited' ? '!' : 
+                              data.status === 'critical' ? '‼' : '✗';
+            const units = data.units > 0 ? `${data.units} units` : 'Out of Stock';
+            
+            return `
+              <div style="border: 1px solid ${statusColor}; border-radius: 5px; padding: 10px; text-align: center; background: rgba(${statusColor === '#28a745' ? '40,167,69' : statusColor === '#ffc107' ? '255,193,7' : statusColor === '#dc3545' ? '220,53,69' : '153,153,153'},0.1);">
+                <div style="font-weight: bold; font-size: 16px; color: ${statusColor};">${type}</div>
+                <div style="font-size: 12px; margin-top: 5px;">${statusIcon} ${units}</div>
+                <div style="font-size: 11px; color: var(--muted); margin-top: 3px;">${data.lastUpdated}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+      container.appendChild(hospitalDiv);
+    }
+  });
+  
+  if (container.innerHTML === '') {
+    container.innerHTML = '<p style="text-align: center; color: var(--muted);">No matching blood types found in selected hospitals.</p>';
+  }
+}
+
+// Reset Blood Filters
+function resetBloodFilter() {
+  document.getElementById('bloodTypeFilter').value = 'all';
+  document.getElementById('bloodHospitalFilter').value = 'all';
+  document.getElementById('bloodAvailabilityFilter').value = 'all';
+  displayBloodAvailability();
+}
+
+// Display Bed Availability
+function displayBedAvailability() {
+  const container = document.getElementById('bedAvailabilityContainer');
+  container.innerHTML = '';
+  
+  bedAvailabilityDatabase.forEach(hospital => {
+    const hospitalDiv = document.createElement('div');
+    hospitalDiv.className = 'bed-hospital-card';
+    hospitalDiv.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+        <div>
+          <h3 style="margin: 0 0 5px 0; color: var(--highlight);">${hospital.hospital}</h3>
+          <p style="margin: 0; font-size: 14px; color: var(--muted);">📞 ${hospital.phone} | 📍 ${hospital.distance} | Capacity: ${hospital.totalBeds} beds</p>
+        </div>
+        <div style="text-align: right; background: rgba(0,102,204,0.1); padding: 8px 12px; border-radius: 5px;">
+          <div style="font-weight: bold; color: var(--accent); font-size: 18px;">${hospital.occupancyRate}</div>
+          <div style="font-size: 12px; color: var(--muted);">Occupancy</div>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
+        ${Object.entries(hospital.beds).map(([type, data]) => {
+          const disponibility = data.available > 0 ? 'yes' : 'no';
+          const statusColor = data.status === 'available' ? '#28a745' : 
+                             data.status === 'limited' ? '#ffc107' : '#dc3545';
+          const statusText = data.status === 'available' ? '✓ Available' : 
+                            data.status === 'limited' ? '! Limited' : '✗ Full';
+          const occupancy = Math.round((data.total - data.available) / data.total * 100);
+          
+          return `
+            <div style="border: 1px solid ${statusColor}; border-radius: 5px; padding: 10px; background: rgba(${statusColor === '#28a745' ? '40,167,69' : statusColor === '#ffc107' ? '255,193,7' : '220,53,69'},0.1);">
+              <div style="font-weight: bold; color: ${statusColor}; margin-bottom: 5px;">${type}</div>
+              <div style="font-size: 13px; margin-bottom: 4px;">
+                <strong>${data.available}</strong>/<strong>${data.total}</strong>
+              </div>
+              <div style="font-size: 11px; color: var(--muted); margin-bottom: 5px;">Beds available</div>
+              <div style="background: #ccc; height: 4px; border-radius: 2px; margin-bottom: 5px;">
+                <div style="background: ${statusColor}; height: 100%; width: ${occupancy}%; border-radius: 2px;"></div>
+              </div>
+              <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px;">${occupancy}% occupied</div>
+              <div style="font-size: 12px; color: ${statusColor}; font-weight: bold;">${statusText}</div>
+              <div style="font-size: 10px; color: var(--muted); margin-top: 3px;">${data.price}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div style="font-size: 11px; color: var(--muted); margin-top: 8px;">Last updated: ${hospital.beds.ICU.lastUpdated}</div>
+    `;
+    container.appendChild(hospitalDiv);
+  });
+}
+
+// Filter Bed Availability
+function filterBedAvailability() {
+  const bedType = document.getElementById('bedTypeFilter').value;
+  const hospital = document.getElementById('bedHospitalFilter').value;
+  const status = document.getElementById('bedStatusFilter').value;
+  
+  const container = document.getElementById('bedAvailabilityContainer');
+  container.innerHTML = '';
+  
+  let filtered = bedAvailabilityDatabase;
+  
+  if (hospital !== 'all') {
+    filtered = filtered.filter(h => h.hospital === hospital);
+  }
+  
+  filtered.forEach(hosp => {
+    let hasMatchingBeds = false;
+    let filteredBeds = {};
+    
+    Object.entries(hosp.beds).forEach(([type, data]) => {
+      let matches = true;
+      
+      if (bedType !== 'all' && type !== bedType) matches = false;
+      if (status !== 'all' && data.status !== status) matches = false;
+      
+      if (matches) {
+        hasMatchingBeds = true;
+        filteredBeds[type] = data;
+      }
+    });
+    
+    if (hasMatchingBeds) {
+      const hospitalDiv = document.createElement('div');
+      hospitalDiv.className = 'bed-hospital-card';
+      hospitalDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+          <div>
+            <h3 style="margin: 0 0 5px 0; color: var(--highlight);">${hosp.hospital}</h3>
+            <p style="margin: 0; font-size: 14px; color: var(--muted);">📞 ${hosp.phone} | 📍 ${hosp.distance} | Capacity: ${hosp.totalBeds} beds</p>
+          </div>
+          <div style="text-align: right; background: rgba(0,102,204,0.1); padding: 8px 12px; border-radius: 5px;">
+            <div style="font-weight: bold; color: var(--accent); font-size: 18px;">${hosp.occupancyRate}</div>
+            <div style="font-size: 12px; color: var(--muted);">Occupancy</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px;">
+          ${Object.entries(filteredBeds).map(([type, data]) => {
+            const statusColor = data.status === 'available' ? '#28a745' : 
+                               data.status === 'limited' ? '#ffc107' : '#dc3545';
+            const statusText = data.status === 'available' ? '✓ Available' : 
+                              data.status === 'limited' ? '! Limited' : '✗ Full';
+            const occupancy = Math.round((data.total - data.available) / data.total * 100);
+            
+            return `
+              <div style="border: 1px solid ${statusColor}; border-radius: 5px; padding: 10px; background: rgba(${statusColor === '#28a745' ? '40,167,69' : statusColor === '#ffc107' ? '255,193,7' : '220,53,69'},0.1);">
+                <div style="font-weight: bold; color: ${statusColor}; margin-bottom: 5px;">${type}</div>
+                <div style="font-size: 13px; margin-bottom: 4px;">
+                  <strong>${data.available}</strong>/<strong>${data.total}</strong>
+                </div>
+                <div style="font-size: 11px; color: var(--muted); margin-bottom: 5px;">Beds available</div>
+                <div style="background: #ccc; height: 4px; border-radius: 2px; margin-bottom: 5px;">
+                  <div style="background: ${statusColor}; height: 100%; width: ${occupancy}%; border-radius: 2px;"></div>
+                </div>
+                <div style="font-size: 11px; color: var(--muted); margin-bottom: 3px;">${occupancy}% occupied</div>
+                <div style="font-size: 12px; color: ${statusColor}; font-weight: bold;">${statusText}</div>
+                <div style="font-size: 10px; color: var(--muted); margin-top: 3px;">${data.price}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div style="font-size: 11px; color: var(--muted); margin-top: 8px;">Last updated: ${Object.values(filteredBeds)[0].lastUpdated}</div>
+      `;
+      container.appendChild(hospitalDiv);
+    }
+  });
+  
+  if (container.innerHTML === '') {
+    container.innerHTML = '<p style="text-align: center; color: var(--muted);">No beds matching your criteria found.</p>';
+  }
+}
+
+// Reset Bed Filters
+function resetBedFilter() {
+  document.getElementById('bedTypeFilter').value = 'all';
+  document.getElementById('bedHospitalFilter').value = 'all';
+  document.getElementById('bedStatusFilter').value = 'all';
+  displayBedAvailability();
+}
+
+// Filter Blood Donation Hospitals
+function filterDonationHospitals() {
+  const bloodType = document.getElementById('bloodTypeSearch').value;
+  const hospitalName = document.getElementById('donationHospitalSearch').value.toLowerCase();
+  const select = document.getElementById('donationHospital');
+  const options = select.getElementsByTagName('option');
+  
+  for (let option of options) {
+    if (option.value === '') continue; // Skip placeholder
+    
+    const optionText = option.textContent.toLowerCase();
+    const matchesSearch = hospitalName === '' || optionText.includes(hospitalName);
+    
+    if (matchesSearch) {
+      option.style.display = '';
+    } else {
+      option.style.display = 'none';
+    }
+  }
+  
+  // Auto-select blood type if provided
+  if (bloodType) {
+    document.getElementById('bloodTypeSelect').value = bloodType;
+  }
+}
+
+// Reset Blood Donation Filters
+function resetDonationFilters() {
+  document.getElementById('bloodTypeSearch').value = '';
+  document.getElementById('donationHospitalSearch').value = '';
+  const select = document.getElementById('donationHospital');
+  const options = select.getElementsByTagName('option');
+  for (let option of options) {
+    option.style.display = '';
+  }
+}
+
+// Filter hospital form dropdown
+function filterHospitalForm() {
+  const searchText = document.getElementById('hospitalSearchForm').value.toLowerCase();
+  const dept = document.getElementById('appointmentDept').value.toLowerCase();
+  const select = document.getElementById('hospital');
+  const options = select.getElementsByTagName('option');
+  
+  for (let option of options) {
+    const optionText = option.textContent.toLowerCase();
+    const matchesSearch = searchText === '' || optionText.includes(searchText);
+    const matchesDept = dept === '' || optionText.includes(dept);
+    
+    if (matchesSearch && matchesDept) {
+      option.style.display = '';
+    } else {
+      option.style.display = 'none';
+    }
+  }
+}
+
+// Reset hospital form filter
+function resetHospitalForm() {
+  document.getElementById('appointmentDept').value = '';
+  document.getElementById('hospitalSearchForm').value = '';
+  const select = document.getElementById('hospital');
+  const options = select.getElementsByTagName('option');
+  for (let option of options) {
+    option.style.display = '';
+  }
+}
+
+// Main search - searches both hospitals and doctors
+function performMainSearch() {
+  const searchText = document.getElementById('mainSearch').value.toLowerCase();
+  const searchType = document.getElementById('mainSearchType').value;
+  
+  if (searchText === '') return;
+  
+  // Determine what to search
+  if (searchType === 'all' || searchType === 'hospitals') {
+    document.getElementById('hospitalSearch').value = '';
+    filterHospitals();
+    
+    // Highlight hospitals matching search
+    const hospitalList = document.getElementById('hospitalList');
+    const items = hospitalList.getElementsByTagName('li');
+    for (let item of items) {
+      if (item.style.display !== 'none') {
+        const hospitalName = item.querySelector('strong').textContent.toLowerCase();
+        if (hospitalName.includes(searchText)) {
+          item.style.backgroundColor = 'rgba(255, 215, 0, 0.3)';
+        }
+      }
+    }
+  }
+  
+  if (searchType === 'all' || searchType === 'doctors') {
+    document.getElementById('doctorSearch').value = '';
+    filterDoctors();
+  }
+}
+
+// Reset main search
+function resetMainSearch() {
+  document.getElementById('mainSearch').value = '';
+  document.getElementById('mainSearchType').value = 'all';
+  resetHospitals();
+  resetDoctors();
+  const hospitalList = document.getElementById('hospitalList');
+  const items = hospitalList.getElementsByTagName('li');
+  for (let item of items) {
+    item.style.backgroundColor = '';
+  }
+}
+
+let greeted = false;
+let chatLang = 'en-US';
+let voiceOutEnabled = false;
+let sihRecognitionRef = null;
+
+function sihSetChatLanguage(){
+  const sel = document.getElementById('chatLangSelect');
+  chatLang = sel.value;
+  if (sihRecognitionRef) sihRecognitionRef.lang = chatLang;
+  const labels = {'en-US':'Language set to English.', 'ta-IN':'மொழி தமிழ் ஆக மாற்றப்பட்டது.', 'hi-IN':'भाषा हिन्दी में बदल दी गई है.'};
+  addMessage(labels[chatLang] || labels['en-US'], 'Bot');
+  if (voiceOutEnabled) sihSpeakReply(labels[chatLang] || labels['en-US']);
+}
+
+function sihToggleVoiceOut(){
+  voiceOutEnabled = !voiceOutEnabled;
+  const btn = document.getElementById('chatVoiceOutBtn');
+  btn.setAttribute('aria-pressed', voiceOutEnabled ? 'true' : 'false');
+  btn.textContent = voiceOutEnabled ? '🔈' : '🔊';
+}
+
+function sihSpeakReply(text){
+  if(!('speechSynthesis' in window)) return;
+  const clean = String(text).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+  if(!clean) return;
+  const u = new SpeechSynthesisUtterance(clean);
+  u.lang = chatLang;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  // Initialize blood and bed availability display
+  displayBloodAvailability();
+  displayBedAvailability();
+  
+  // Show intro message
+  document.getElementById("chatbot-intro").style.display = "block";
+  setTimeout(function(){
+    document.getElementById("chatbot-icon").classList.add("animate");
+    document.getElementById("chatbot-intro").style.display = "none";
+  }, 5000);
+
+  // Voice recognition setup
+  const micBtn = document.getElementById('micBtn');
+  const userInput = document.getElementById('user-input');
+  if ('webkitSpeechRecognition' in window) {
+   const recognition = new webkitSpeechRecognition();
+   recognition.lang = chatLang;
+   sihRecognitionRef = recognition;
+   recognition.onresult = function(event) {
+     userInput.value = event.results[0][0].transcript;
+     sendMessage();
+  };
+  micBtn.onclick = function() {
+    recognition.lang = chatLang;
+    recognition.start();
+  };
+} else {
+  micBtn.disabled = true;
+  micBtn.title = "Speech recognition not supported";
+}
+});
+
+document.getElementById("chatbot-box").classList.add("show-animate");
+  document.getElementById("user-input").addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+      sendMessage();
+    }
+  });
+
+
+function addMessage(text, sender){
+  var chatbox = document.getElementById("chat-messages");
+  var msg = document.createElement("div");
+  msg.className = 'msg ' + (sender === 'You' ? 'user' : 'bot');
+
+  var senderElem = document.createElement('div');
+  senderElem.className = 'msg-sender';
+  senderElem.textContent = sender === 'You' ? 'You' : 'Bot';
+
+  // enforce black text inline to avoid CSS override issues
+  senderElem.style.color = '#000';
+
+  var textElem = document.createElement('div');
+  textElem.className = 'msg-text';
+  // allow HTML for bot responses (they may contain formatting)
+  if (sender === 'Bot') textElem.innerHTML = text;
+  else textElem.textContent = text;
+
+  // force black text color to guarantee visibility
+  textElem.style.color = '#000';
+  textElem.style.whiteSpace = 'pre-wrap';
+
+  msg.appendChild(senderElem);
+  msg.appendChild(textElem);
+  chatbox.appendChild(msg);
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+
+ 
+
+ document.addEventListener("DOMContentLoaded", function(){
+ document.getElementById("user-input").addEventListener("keypress", function(e){
+   if(e.key === "Enter"){
+     sendMessage();
+   }
+ });
+});
+
+ 
+
+function toggleChat(){
+  let box = document.getElementById("chatbot-box");
+
+  if(box.style.display === "block"){
+    box.style.display = "none";
+  }
+  else{
+    box.style.display = "block";
+
+    if(!greeted){
+      addMessage('Hello! I am TAN your smart health assistant. How can I help you today?', 'Bot');
+      greeted = true;
+    }
+  }
+
+  document.getElementById("user-input").addEventListener("keypress", function(e){
+    if(e.key === "Enter"){
+      sendMessage();
+    }
+  });
+}
+
+function sendMessage(){
+  try {
+    const inputbox = document.getElementById("user-input");
+    const raw = inputbox.value || '';
+    const input = raw.trim();
+
+    if (input === '') return;
+
+    // ensure chat is visible
+    const box = document.getElementById('chatbot-box');
+    if (box && box.style.display !== 'block') box.style.display = 'block';
+
+    // show user message using message-bubble
+    addMessage(raw, 'You');
+    inputbox.value = '';
+    inputbox.focus();
+
+    // Get bot reply (with safe error handling)
+    setTimeout(function(){
+      try {
+        const reply = getReply(input.toLowerCase());
+        addMessage(reply, 'Bot');
+        if (voiceOutEnabled) sihSpeakReply(reply);
+      } catch (err) {
+        console.error('Reply error', err);
+        addMessage('Sorry, something went wrong while generating a reply.', 'Bot');
+      }
+    }, 300);
+  } catch (e) {
+    console.error('sendMessage error', e);
+  }
+}
+
+function getReply(userInput) {
+  // Doctor Profile Search
+  if(/profile|see doctor details|doctor info|experience|qualifications|expertise/.test(userInput)) {
+    const doctorMatches = doctorsDatabase.filter(doc => 
+      userInput.toLowerCase().includes(doc.name.toLowerCase()) || 
+      userInput.toLowerCase().includes(doc.specialty.toLowerCase())
+    );
+    
+    if(doctorMatches.length > 0) {
+      const doc = doctorMatches[0];
+      return `**${doc.name}** ⭐ ${doc.rating}/5\n\n` +
+        `**Specialty:** ${doc.specialty}\n` +
+        `**Qualification:** ${doc.qualification}\n` +
+        `**Experience:** ${doc.experience}+ years\n` +
+        `**Hospital:** ${doc.hospital}\n` +
+        `**Consultation Fee:** ₹${doc.fee}\n` +
+        `**Patient Reviews:** ${doc.reviews} reviews\n\n` +
+        `**About:** ${doc.about}\n\n` +
+        `**Consultation Options:** ${doc.consultation.join(", ")}\n` +
+        `**Languages:** ${doc.languages.join(", ")}\n\n` +
+        `Would you like to book an appointment or consultation with ${doc.name}?`;
+    }
+    
+    return "Which doctor would you like to know about? I can show you details, experience, ratings, and reviews!";
+  }
+
+  // Blood Availability
+  if(/blood|blood availability|blood type|blood donation|blood bank|blood stock|urgent blood|need blood/.test(userInput)) {
+    if(/which hospital|where|location/.test(userInput)) {
+      return `**Blood Availability Near You** 🩸\n\n` +
+        `We have real-time blood availability data for 11+ hospitals:\n\n` +
+        `**Top Hospitals with High O+ Stock:**\n` +
+        `• Saveetha Hospital - 62 units O+ (45+ km avg distance)\n` +
+        `• Panimalar Hospital - 60 units O+\n` +
+        `• Government Hospital - 58 units O+\n` +
+        `• S.S Hospital - 55 units O+\n\n` +
+        `**Urgent Blood (Critical Stock) Available at:**\n` +
+        `• Hope Hospital (1.0 km) - Limited stock\n` +
+        `• Sri Balaji Medical (1.0 km) - Limited-Critical stock\n` +
+        `• RMD Specialities Hospital (8.03 km)\n\n` +
+        `Use the Blood Availability filter to find your blood type at nearby hospitals!`;
+    }
+    
+    if(/AB|rare|negative|critical/.test(userInput)) {
+      return `**Rare Blood Types Alert!** ⚠️\n\n` +
+        `Negative and AB blood types have LIMITED availability:\n\n` +
+        `**AB- (Most Rare) - CRITICAL:**\n` +
+        `❌ Currently UNAVAILABLE at most hospitals\n` +
+        `⚠️ Contact blood bank immediately if urgent\n\n` +
+        `**B- (Rare) - LIMITED:**\n` +
+        `• Hope Hospital: 3 units\n` +
+        `• Sri Balaji: 1 unit\n` +
+        `• Government Hospital: 3 units\n\n` +
+        `**Recommendation:** If you need rare blood types urgently:\n` +
+        `1. Call hospitals directly\n` +
+        `2. Contact Red Cross Blood Bank\n` +
+        `3. Consider voluntary blood donation to increase stock\n\n` +
+        `Would you like contact details for any specific hospital?`;
+    }
+    
+    if(/O\+|O positive|common|universal/.test(userInput)) {
+      return `**O+ (Universal Donor) - HIGHLY AVAILABLE** ✓\n\n` +
+        `All hospitals maintain good O+ stock:\n\n` +
+        `**Highest Stock Hospitals:**\n` +
+        `• Saveetha Hospital: 62 units (6-7 km)\n` +
+        `• Panimalar Hospital: 60 units (3.02 km) ✨\n` +
+        `• Government Hospital: 58 units (5.02 km)\n` +
+        `• S.S Hospital: 55 units (3.02 km)\n` +
+        `• Meenakshi Hospital: 53 units (10.02 km)\n\n` +
+        `**Nearest Options (1 km):**\n` +
+        `• Hope Hospital: 45 units\n` +
+        `• Sri Balaji Medical: 52 units\n\n` +
+        `Average wait time: 15-30 min for immediate transfusion\n\nNeed help with anything else?`;
+    }
+    
+    return `**Blood Availability Search** 🩸\n\n` +
+      `I can help you find:\n\n` +
+      `✓ Blood type availability at nearby hospitals\n` +
+      `✓ Current stock levels (updated real-time)\n` +
+      `✓ Nearest hospitals with your blood type\n` +
+      `✓ Info on rare/critical blood types\n\n` +
+      `**Simply ask:**\n` +
+      `"Which hospital has O+ blood?"\n` +
+      `"Is there AB- blood available?"\n` +
+      `"Where can I find B+ blood near me?"\n` +
+      `"What blood types are critical?"\n\n` +
+      `Or use the **Blood Availability** filter section to search directly!\n\n` +
+      `What blood type are you looking for?`;
+  }
+
+  // Blood Donation
+  if(/donate|blood donor|donation|save lives|help others|volunteer/.test(userInput)) {
+    if(/requirements|eligibility|can i donate|qualify|age|weight/.test(userInput)) {
+      return `**Blood Donation Eligibility** 💉\n\n` +
+        `✓ **Age:** 18-65 years\n` +
+        `✓ **Weight:** Minimum 45 kg\n` +
+        `✓ **Health:** In good health, no fever/cold\n` +
+        `✓ **Frequency:** Can donate every 3 months\n` +
+        `✓ **No medications:** Except vitamins\n\n` +
+        `**NOT eligible if you:**\n` +
+        `❌ Have chronic diseases (diabetes, hypertension)\n` +
+        `❌ Recently had surgery or tattoos\n` +
+        `❌ Are pregnant or breastfeeding\n` +
+        `❌ Have donated in last 3 months\n\n` +
+        `Ready to donate? Use our **Blood Donation Appointment** section to schedule! 🩸`;
+    }
+    
+    if(/process|how does it work|what happens|procedure/.test(userInput)) {
+      return `**Blood Donation Process** 🩸\n\n` +
+        `**Step 1: Registration** (5 min)\n` +
+        `→ Fill in your details and health form\n\n` +
+        `**Step 2: Pre-Donation Screening** (10 min)\n` +
+        `→ Blood pressure, hemoglobin, weight check\n` +
+        `→ Doctor consultation\n\n` +
+        `**Step 3: Blood Collection** (10-15 min)\n` +
+        `→ Professional staff collects 450 ml blood\n` +
+        `→ Sterile, safe procedure\n\n` +
+        `**Step 4: Rest & Refreshment** (10-15 min)\n` +
+        `→ Observation period\n` +
+        `→ Complimentary snacks & juice\n\n` +
+        `**Total Time:** 45-60 minutes\n\n` +
+        `Ready to donate? **Book an appointment** now! 💪`;
+    }
+    
+    if(/benefits|rewards|incentives/.test(userInput)) {
+      return `**Donor Benefits & Rewards** 🎁\n\n` +
+        `**Health Benefits:**\n` +
+        `✓ Free health check-up\n` +
+        `✓ Blood test reports\n` +
+        `✓ Hemoglobin level check\n` +
+        `✓ Health counseling\n\n` +
+        `**Recognition:**\n` +
+        `✓ Blood Donor Certificate\n` +
+        `✓ Donor ID Card\n` +
+        `✓ Free blood for emergency use\n` +
+        `✓ Priority in blood emergencies\n\n` +
+        `**Rewards:**\n` +
+        `✓ Special discounts on lab tests\n` +
+        `✓ 10% off on health packages\n` +
+        `✓ Donor appreciation gifts\n` +
+        `✓ Eligible for 5-unit free blood per year\n\n` +
+        `Join our hero community of 10,000+ donors! 🦸`;
+    }
+    
+    if(/time|when|appointment|schedule/.test(userInput)) {
+      return `**Schedule Your Blood Donation** 📅\n\n` +
+        `**Available Slots:**\n` +
+        `⏰ 08:00 AM - 09:00 PM (All days)\n` +
+        `⏰ Weekend slots available\n` +
+        `⏰ Emergency donors: 24-hour availability\n\n` +
+        `**Nearby Donation Centers:**\n` +
+        `🏥 Hope Hospital - 1.0 km\n` +
+        `🏥 Sri Balaji Medical - 1.0 km\n` +
+        `🏥 Panimalar Hospital - 3.02 km\n` +
+        `🏥 Government Hospital -  5.02 km\n` +
+        `🏥 Saveetha Hospital - 6-7 km\n\n` +
+        `💡 **Tip:** Morning slots fill up quickly!\n\n` +
+        `Click **Book a Blood Donation Appointment** button to schedule yours!`;
+    }
+    
+    return `**Save Lives Through Blood Donation** 🩸❤️\n\n` +
+      `One donation can save up to 3 lives!\n\n` +
+      `I can help you with:\n\n` +
+      `✓ **Eligibility Check** - Verify if you can donate\n` +
+      `✓ **Process Info** - How blood donation works\n` +
+      `✓ **Benefits & Rewards** - Why you should donate\n` +
+      `✓ **Schedule Appointment** - Book a donation slot\n\n` +
+      `**Why Donate Blood?**\n` +
+      `• Save lives in emergencies\n` +
+      `• Free health check-up\n` +
+      `• Get blood donor benefits\n` +
+      `• Join a community of heroes\n` +
+      `• Feel the satisfaction of helping\n\n` +
+      `Ready to become a blood hero? Let's go! 💪`;
+  }
+
+  // Bed Availability
+  if(/bed|admission|room|hospital room|admit|hospitalization|inpatient|ward/.test(userInput)) {
+    if(/availability|vacant|empty|empty bed|available beds/.test(userInput)) {
+      return `**Hospital Bed Availability** 🛏️\n\n` +
+        `Real-time bed availability across 11+ hospitals:\n\n` +
+        `**Best Availability (Now):**\n` +
+        `🏥 Government Hospital - 35+ general beds available\n` +
+        `🏥 Panimalar Hospital - 22+ general beds available\n` +
+        `🏥 Saveetha Hospital - 38+ general beds available\n\n` +
+        `**ICU Beds:**\n` +
+        `🏥 Government Hospital - 10 ICU beds\n` +
+        `🏥 Saveetha Hospital - 12 ICU beds\n` +
+        `🏥 Panimalar Hospital - 8 ICU beds\n\n` +
+        `**Private Rooms (Premium):**\n` +
+        `🏥 Saveetha Hospital - 14 private beds\n` +
+        `🏥 Panimalar Hospital - 8 private beds\n\n` +
+        `Use the **Bed Availability** filter to check real-time updates for all hospitals!`;
+    }
+    
+    if(/icu|critical|intensive care/.test(userInput)) {
+      return `**ICU Beds (Intensive Care Units)** 🏥\n\n` +
+        `**Currently Available:**\n` +
+        `✓ Saveetha Hospital - 12/25 (48% available)\n` +
+        `✓ Panimalar Hospital - 8/20 (40% available)\n` +
+        `✓ Government Hospital - 10/25 (40% available)\n\n` +
+        `**Limited ICU Stock:**\n` +
+        `⚠️ Pettai 24 Hours - 2/10 beds\n` +
+        `⚠️ Mangalam Hospital - 3/10 beds\n` +
+        `⚠️ Be Well Hospital - 2/8 beds\n\n` +
+        `**Cost:** ₹1,500 - ₹9,500 per day\n\n` +
+        `For ICU admission, contact hospitals directly or use our **Book an Appointment** section!`;
+    }
+    
+    if(/maternity|delivery|pregnant|obstetrics|gynec/.test(userInput)) {
+      return `**Maternity Beds & Delivery Rooms** 👶\n\n` +
+        `**Available Maternity Beds:**\n` +
+        `✓ Government Hospital - 8/25 beds\n` +
+        `✓ Saveetha Hospital - 10/30 beds\n` +
+        `✓ Panimalar Hospital - 6/25 beds\n\n` +
+        `**Specialty Maternity Centers:**\n` +
+        `🏥 Sri Balaji Medical - 3/20 (Limited)\n` +
+        `🏥 Panimalar Hospital - 6/25 (Available)\n` +
+        `🏥 Government Hospital - 8/25 (Available)\n\n` +
+        `**Services Included:**\n` +
+        `✓ 24/7 gynecologist availability\n` +
+        `✓ Modern delivery suites\n` +
+        `✓ Neonatal ICU if needed\n` +
+        `✓ Post-delivery care\n\n` +
+        `**Cost:** ₹2,000 - ₹6,500 per day\n\n` +
+        `For maternity admission, contact our gynecologists or book appointment!`;
+    }
+    
+    if(/price|cost|charges|rates|fees/.test(userInput)) {
+      return `**Hospital Room Pricing** 💰\n\n` +
+        `**General Ward:**\n` +
+        `💵 ₹500 - ₹3,500/day (Most economical)\n` +
+        `• Government Hospital: ₹500/day\n` +
+        `• Private Hospitals: ₹2,200 - ₹3,500/day\n\n` +
+        `**Semi-Private Room:**\n` +
+        `💵 ₹1,800 - ₹5,800/day (Mid-range)\n` +
+        `• Regular hospitals: ₹3,800 - ₹4,800/day\n` +
+        `• Premium hospitals: ₹5,000 - ₹5,800/day\n\n` +
+        `**Private Room (1-bed):**\n` +
+        `💵 ₹3,500 - ₹8,500/day (Premium)\n` +
+        `• Single occupancy rooms\n` +
+        `• Attached bathroom\n` +
+        `• TV & WiFi included\n\n` +
+        `**ICU Beds:**\n` +
+        `💵 ₹1,500 - ₹9,500/day (Critical care)\n\n` +
+        `💡 Prices vary; check specific hospital for details!`;
+    }
+    
+    return `**Find Hospital Beds** 🛏️\n\n` +
+      `I can help you find:\n\n` +
+      `✓ **Real-time bed availability** - Current vacant beds\n` +
+      `✓ **ICU availability** - Critical care beds\n` +
+      `✓ **Room types** - General, Semi-Private, Private\n` +
+      `✓ **Maternity beds** - For deliveries\n` +
+      `✓ **Pricing info** - Room costs by type\n` +
+      `✓ **Hospital locations** - Distance & directions\n\n` +
+      `**Simply ask:**\n` +
+      `"Which hospital has ICU beds?"\n` +
+      `"How much is a private room?"\n` +
+      `"Is maternity ward available?"\n` +
+      `"Show me hospitals near me"\n\n` +
+      `Or use the **Bed Availability** section above to check real-time status! 🏥`;
+  }
+
+  // Lab Tests Booking
+  if(/lab test|blood test|pathology|medical test|checkup|screening/.test(userInput)) {
+    if(/full body|comprehensive|complete checkup/.test(userInput)) {
+      return `**Full Body Checkup - ₹2,500** ⏱️ 2-3 days\n\n` +
+        `Includes:\n✓ Complete Blood Count\n✓ Lipid Profile\n✓ Thyroid Profile\n✓ Liver & Kidney Tests\n✓ Blood Sugar Test\n\n` +
+        `Would you like to book this test? Our labs are available at:\n` +
+        `• Hope Hospital (1.0 km - Open 6 AM - 8 PM)\n` +
+        `• Sri Balaji Medical (1.0 km - Open 6 AM - 8 PM)\n` +
+        `• Multiple centers across the city\n\n` +
+        `Home sample collection available! `;
+    }
+    
+    if(/covid|corona/.test(userInput)) {
+      return `**COVID-19 RT-PCR Test - ₹600** ⏱️ 24 hours\n\nIncludes:\n✓ RT-PCR Testing\n✓ Digital Certificate\n\nAvailable at all our partner labs.\nWill you need home sample collection?`;
+    }
+    
+    if(/thyroid|hormone|endocrine/.test(userInput)) {
+      return `**Thyroid Profile - ₹800** ⏱️ 24 hours\n\nTests:\n✓ TSH Level\n✓ Free T3\n✓ Free T4\n\nKey for checking thyroid disorders, weight issues, fatigue.\nWould you like to book this?`;
+    }
+    
+    return `Popular Lab Tests:\n\n` +
+      `1️⃣ **Complete Blood Count** - ₹300 (24 hrs)\n` +
+      `2️⃣ **Lipid Profile** - ₹500 (Cholesterol check)\n` +
+      `3️⃣ **Thyroid Profile** - ₹800 (24 hrs)\n` +
+      `4️⃣ **Blood Sugar Fasting** - ₹250 (Quick)\n` +
+      `5️⃣ **Liver Tests** - ₹600 (24 hrs)\n` +
+      `6️⃣ **Kidney Tests** - ₹500 (24 hrs)\n` +
+      `7️⃣ **Full Body Checkup** - ₹2,500 (2-3 days)\n` +
+      `8️⃣ **COVID-19 Test** - ₹600 (24 hrs)\n\n` +
+      `**Home sample collection FREE above ₹500**\n\nWhich test would you like to book?`;
+  }
+
+  // Online Consultation
+  if(/online|video call|phone consultation|from home|remote|virtual/.test(userInput)) {
+    const onlineAvailableDoctors = doctorsDatabase.filter(doc => 
+      doc.consultation.includes("Video Call") || doc.consultation.includes("Phone Call")
+    );
+    
+    return `**Online Consultations Available!** 💻\n\n` +
+      `Doctors available for Video/Phone consultations:\n\n` +
+      onlineAvailableDoctors.slice(0, 4).map(doc => 
+        `👨‍⚕️ **${doc.name}** (${doc.specialty})\n   ⭐ ${doc.rating}/5 | ₹${doc.fee} | Available: ${doc.consultation.filter(c => c !== "In-clinic").join(", ")}`
+      ).join("\n\n") + 
+      `\n\n**Benefits:**\n✓ Consult from home\n✓ No travel time\n✓ Flexible timing\n✓ Prescription online\n\nWould you like to book an online consultation?`;
+  }
+
+  // Doctor Ratings and Reviews
+  if(/review|rating|feedback|patient review|comments|opinion/.test(userInput)) {
+    const relevantReviews = reviews.slice(0, 3);
+    return `**Patient Reviews & Ratings** ⭐\n\n` +
+      relevantReviews.map(r => 
+        `**${r.doctor}** - ${r.rating}⭐\n"${r.text}"\n- ${r.author}`
+      ).join("\n\n") +
+      `\n\n**Top Rated Doctors:**\n` +
+      `🥇 Dr. S. Sundari & Dr. K. Vani (4.9/5)\n` +
+      `🥈 Dr. Pradeep (4.8/5)\n` +
+      `🥉 Dr. Harish (4.8/5)\n\n` +
+      `All our doctors have 4.7+ ratings with 250+ verified patient reviews each!`;
+  }
+
+  if(/experience|qualification|expertise/.test(userInput)) {
+    const experiencedDoctors = doctorsDatabase.filter(doc => doc.experience >= 15);
+    return `**Highly Experienced Doctors** 👨‍⚕️\n\n` +
+      experiencedDoctors.map(doc => 
+        `**${doc.name}** (${doc.specialty})\n   ⭐ ${doc.rating}/5 | ${doc.experience}+ years | ₹${doc.fee}`
+      ).join("\n\n") +
+      `\n\nAll our doctors are verified MCI registered with extensive experience in their fields!`;
+  }
+
+  if(/specialist|expert|leading/.test(userInput)) {
+    const specialists = doctorsDatabase.filter(doc => doc.rating >= 4.8);
+    return `**Our Expert Specialists** 🌟\n\n` +
+      specialists.map(doc => 
+        `**${doc.name}** (${doc.specialty})\n   ⭐ ${doc.rating}/5 | ${doc.experience}+ years | ₹${doc.fee}`
+      ).join("\n\n") +
+      `\n\nAll our specialists are top-rated with excellent patient feedback!`;
+  }
+
+  if(/vetrinary|animal clinic|Pet clinic/.test(userInput)) {
+    return `**Veterinary Services** 🐾\n\n` +
+      `We also have top-rated veterinary doctors for your pets:\n\n` +
+      `👨‍⚕️ **Dr. R. Kumar** (Veterinarian)\n   4.9/5 |ph no: 9876543212| 300 reviews | 20+ years | ₹500\n\n` +
+      `👩‍⚕️ **Dr. A. Meena** (Veterinarian)\n   4.8/5 |ph no: 9876543213| 250 reviews | 18+ years | ₹450\n\n` +
+      `👨‍⚕️ **Dr. S. Ravi** (Veterinarian)\n   4.7/5 |ph no: 9876543214| 200 reviews | 15+ years | ₹400\n\n` +
+      `All our vets are experienced in treating dogs, cats, and small animals!`;
+  }
+
+  if(/pediatrician|child specialist/.test(userInput)) {
+    return `**Pediatric Specialists** 👶\n\n` +
+      `Our top pediatricians for your child's health:\n\n` +
+      `👨‍⚕️ **Dr. S. Sundari** (Pediatrician)\n   4.9/5 |ph no: 9876543212| 425 reviews | 15+ years | ₹600\n\n` +
+      `👩‍⚕️ **Dr. A. Meena** (Pediatrician)\n   4.8/5 |ph no: 9876543213| 250 reviews | 18+ years | ₹450\n\n` +
+      `👨‍⚕️ **Dr. S. Ravi** (Pediatrician)\n   4.7/5 |ph no: 9876543214| 200 reviews | 15+ years | ₹400\n\n` +
+      `All our pediatricians are experts in child health, growth, and development!`;
+  }
+
+  if(/gynecologist|obstetrician|women's health/.test(userInput)) {
+    return `**Gynecology Specialists** 👩‍⚕️\n\n` +
+      `Our top gynecologists for women's health:\n\n` +
+      `👩‍⚕️ **Dr. K. Vani** (Gynecologist)\n   4.9/5 |ph no: 9876543212| 567 reviews | 18+ years | ₹700\n\n` +
+      `👩‍⚕️ **Dr. S. Meena** (Gynecologist)\n   4.8/5 |ph no: 9876543213| 320 reviews | 15+ years | ₹650\n\n` +
+      `👩‍⚕️ **Dr. R. Priya** (Gynecologist)\n   4.7/5 |ph no: 9876543214| 280 reviews | 12+ years | ₹600\n\n` +
+      `All our gynecologists are experts in women's health and reproductive care!`;
+  }
+
+  if(/cardiologist|heart specialist/.test(userInput)) {
+    return `**Cardiology Specialists** ❤️\n\n` +
+      `Our top cardiologists for heart health:\n\n` +
+      `👨‍⚕️ **Dr. Pradeep** (Cardiologist)\n   4.8/5 |ph no: 9876543212| 342 reviews | 12+ years | ₹800\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (Cardiologist)\n   4.7/5 |ph no: 9876543213| 300 reviews | 15+ years | ₹750\n\n` +
+      `👨‍⚕️ **Dr. R. Singh** (Cardiologist)\n   4.6/5 |ph no: 9876543214| 250 reviews | 10+ years | ₹700\n\n` +
+      `All our cardiologists are experts in heart diseases, hypertension, and cardiac care!`;
+  }
+
+  if(/orthopedic|bone specialist|joint specialist/.test(userInput)) {
+    return `**Orthopedic Specialists** 🦴\n\n` +
+      `Our top orthopedic doctors for bone and joint health:\n\n` +
+      `👨‍⚕️ **Dr. Harish** (Orthopedic)\n   4.8/5 |ph no: 9876543212| 356 reviews | 11+ years | ₹650\n\n` +
+      `👨‍⚕️ **Dr. S. Reddy** (Orthopedic)\n   4.7/5 |ph no: 9876543213| 300 reviews | 15+ years | ₹600\n\n` +
+      `👨‍⚕️ **Dr. A. Kumar** (Orthopedic)\n   4.6/5 |ph no: 9876543214| 250 reviews | 10+ years | ₹550\n\n` +
+      `All our orthopedic specialists are experts in treating fractures, arthritis, and joint pain!`;
+  }
+
+  if(/dermatologist|skin specialist|skin disease/.test(userInput)) {
+    return `**Dermatology Specialists** 🌟\n\n` +
+      `Our top dermatologists for skin health:\n\n` +
+      `👩‍⚕️ **Dr. S. Meena** (Dermatologist)\n   4.8/5 |ph no: 9876543212| 320 reviews | 15+ years | ₹650\n\n` +
+      `👨‍⚕️ **Dr. R. Priya** (Dermatologist)\n   4.7/5 |ph no: 9876543213| 280 reviews | 12+ years | ₹600\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (Dermatologist)\n   4.6/5 |ph no: 9876543214| 250 reviews | 10+ years | ₹550\n\n` +
+      `All our dermatologists are experts in treating acne, eczema, and skin infections!`;
+  }
+
+  if(/fever about"any" degree|fever|headache|cold/.test(userInput)) {
+    return `**General Physicians** 🩺\n\n` +
+      `Our top general physicians for overall health:\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (General Physician)\n   4.7/5 |ph no: 9876543212| 300 reviews | 15+ years | ₹500\n\n` +
+      `👩‍⚕️ **Dr. A. Meena** (General Physician)\n   4.8/5 |ph no: 9876543213| 250 reviews | 18+ years | ₹450\n\n` +
+      `👨‍⚕️ **Dr. S. Ravi** (General Physician)\n   4.7/5 |ph no: 9876543214| 200 reviews | 15+ years | ₹400\n\n` +
+      `All our general physicians are experts in diagnosing and treating a wide range of health conditions!`;
+  }
+
+  if(/diabetes|sugar|blood sugar|endocrine/.test(userInput)) {
+    return `**Endocrinology Specialists** 🩸\n\n` +
+      `Our top endocrinologists for diabetes and hormonal health:\n\n` +
+      `👨‍⚕️ **Dr. Pradeep** (Endocrinologist)\n   4.8/5 |ph no: 9876543212| 342 reviews | 12+ years | ₹800\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (Endocrinologist)\n   4.7/5 |ph no: 9876543213| 300 reviews | 15+ years | ₹750\n\n` +
+      `👨‍⚕️ **Dr. R. Singh** (Endocrinologist)\n   4.6/5 |ph no: 9876543214| 250 reviews | 10+ years | ₹700\n\n` +
+      `All our endocrinologists are experts in managing diabetes, thyroid disorders, and hormonal imbalances!`;
+  }
+
+  if(/mental health|psychiatrist|psychologist|counselor/.test(userInput)) {
+    return `**Mental Health Specialists** 🧠\n\n` +
+      `Our top mental health professionals for emotional well-being:\n\n` +
+      `👨‍⚕️ **Dr. R. Kumar** (Psychiatrist)\n   4.9/5 |ph no: 9876543212| 300 reviews | 20+ years | ₹500\n\n` +
+      `👩‍⚕️ **Dr. A. Meena** (Psychologist)\n   4.8/5 |ph no: 9876543213| 250 reviews | 18+ years | ₹450\n\n` +
+      `👨‍⚕️ **Dr. S. Ravi** (Counselor)\n   4.7/5 |ph no: 9876543214| 200 reviews | 15+ years | ₹400\n\n` +
+      `All our mental health specialists are experts in treating anxiety, depression, and stress-related disorders!`;
+  }
+
+  if(/eye specialist|ophthalmologist/.test(userInput)) {
+    return `**Ophthalmology Specialists** 👁️\n\n` +
+      `Our top eye doctors for vision care:\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (Ophthalmologist)\n   4.7/5 |ph no: 9876543212| 300 reviews | 15+ years | ₹500\n\n` +
+      `👩‍⚕️ **Dr. A. Meena** (Ophthalmologist)\n   4.8/5 |ph no: 9876543213| 250 reviews | 18+ years | ₹450\n\n` +
+      `👨‍⚕️ **Dr. S. Ravi** (Ophthalmologist)\n   4.7/5 |ph no: 9876543214| 200 reviews | 15+ years | ₹400\n\n` +
+      `All our ophthalmologists are experts in treating vision problems, cataracts, and eye infections!`;
+  }
+
+  if(/ENT|ear nose throat|otolaryngologist/.test(userInput)) {
+    return `**ENT Specialists** 👂👃👄\n\n` +
+      `Our top ENT doctors for ear, nose, and throat care:\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (ENT Specialist)\n   4.7/5 |ph no: 9876543212| 300 reviews | 15+ years | ₹500\n\n` +
+      `👩‍⚕️ **Dr. A. Meena** (ENT Specialist)\n   4.8/5 |ph no: 9876543213| 250 reviews | 18+ years | ₹450\n\n` +
+      `👨‍⚕️ **Dr. S. Ravi** (ENT Specialist)\n   4.7/5 |ph no: 9876543214| 200 reviews | 15+ years | ₹400\n\n` +
+      `All our ENT specialists are experts in treating sinusitis, ear infections, and throat problems!`;
+  }
+
+  if(/gastroenterologist|digestive health/.test(userInput)) {
+    return `**Gastroenterology Specialists** 🍽️\n\n` +
+      `Our top gastroenterologists for digestive health:\n\n` +
+      `👨‍⚕️ **Dr. Pradeep** (Gastroenterologist)\n   4.8/5 |ph no: 9876543212| 342 reviews | 12+ years | ₹800\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (Gastroenterologist)\n   4.7/5 |ph no: 9876543213| 300 reviews | 15+ years | ₹750\n\n` +
+      `👨‍⚕️ **Dr. R. Singh** (Gastroenterologist)\n   4.6/5 |ph no: 9876543214| 250 reviews | 10+ years | ₹700\n\n` +
+      `All our gastroenterologists are experts in treating acid reflux, ulcers, and digestive disorders!`;
+  }
+
+  if(/neurologist|brain specialist|nervous system/.test(userInput)) {
+    return `**Neurology Specialists** 🧠\n\n` +
+      `Our top neurologists for brain and nervous system care:\n\n` +
+      `👨‍⚕️ **Dr. Pradeep** (Neurologist)\n   4.8/5 |ph no: 9876543212| 342 reviews | 12+ years | ₹800\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (Neurologist)\n   4.7/5 |ph no: 9876543213| 300 reviews | 15+ years | ₹750\n\n` +
+      `👨‍⚕️ **Dr. R. Singh** (Neurologist)\n   4.6/5 |ph no: 9876543214| 250 reviews | 10+ years | ₹700\n\n` +
+      `All our neurologists are experts in treating migraines, epilepsy, and neurological disorders!`;
+  }
+
+  if(/psychiatrist|mental health|counselor/.test(userInput)) {
+    return `**Mental Health Specialists** 🧠\n\n` +
+      `Our top mental health professionals for emotional well-being:\n\n` +
+      `👨‍⚕️ **Dr. R. Kumar** (Psychiatrist)\n   4.9/5 |ph no: 9876543212| 300 reviews | 20+ years | ₹500\n\n` +
+      `👩‍⚕️ **Dr. A. Meena** (Psychologist)\n   4.8/5 |ph no: 9876543213| 250 reviews | 18+ years | ₹450\n\n` +
+      `👨‍⚕️ **Dr. S. Ravi** (Counselor)\n   4.7/5 |ph no: 9876543214| 200 reviews | 15+ years | ₹400\n\n` +
+      `All our mental health specialists are experts in treating anxiety, depression, and stress-related disorders!`;
+  }
+
+  if(/diabetes|endocrinologist|hormone specialist/.test(userInput)) {
+    return `**Endocrinology Specialists** 🩸\n\n` +
+      `Our top endocrinologists for diabetes and hormonal health:\n\n` +
+      `👨‍⚕️ **Dr. Pradeep** (Endocrinologist)\n   4.8/5 |ph no: 9876543212| 342 reviews | 12+ years | ₹800\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (Endocrinologist)\n   4.7/5 |ph no: 9876543213| 300 reviews | 15+ years | ₹750\n\n` +
+      `👨‍⚕️ **Dr. R. Singh** (Endocrinologist)\n   4.6/5 |ph no: 9876543214| 250 reviews | 10+ years | ₹700\n\n` +
+      `All our endocrinologists are experts in managing diabetes, thyroid disorders, and hormonal imbalances!`;
+  }
+
+  if(/allergy|immunologist|allergist/.test(userInput)) {
+    return `**Allergy Specialists** 🤧\n\n` +
+      `Our top allergists for allergy testing and treatment:\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (Allergist)\n   4.7/5 |ph no: 9876543215| 300 reviews | 15+ years | ₹500\n\n` +
+      `👩‍⚕️ **Dr. A. Meena** (Allergist)\n   4.8/5 |ph no: 9876543216| 250 reviews | 18+ years | ₹450\n\n` +
+      `👨‍⚕️ **Dr. S. Ravi** (Allergist)\n   4.7/5 |ph no: 9876543217| 200 reviews | 15+ years | ₹400\n\n` +
+      `All our allergists are experts in treating seasonal allergies, food allergies, and asthma!`;
+  }
+
+  if(/diabetes|sugar|blood sugar|endocrine/.test(userInput)) {
+    return `**Endocrinology Specialists** 🩸\n\n` +
+      `Our top endocrinologists for diabetes and hormonal health:\n\n` +
+      `👨‍⚕️ **Dr. Pradeep** (Endocrinologist)\n   4.8/5 |ph no: 9876543212| 342 reviews | 12+ years | ₹800\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (Endocrinologist)\n   4.7/5 |ph no: 9876543213| 300 reviews | 15+ years | ₹750\n\n` +
+      `👨‍⚕️ **Dr. R. Singh** (Endocrinologist)\n   4.6/5 |ph no: 9876543214| 250 reviews | 10+ years | ₹700\n\n` +
+      `All our endocrinologists are experts in managing diabetes, thyroid disorders, and hormonal imbalances!`;
+  }
+
+  if(/hypertension|blood pressure|heart health|bp/.test(userInput)) {
+    return `**Cardiology Specialists** ❤️\n\n` +
+      `Our top cardiologists for heart health:\n\n` +
+      `👨‍⚕️ **Dr. Pradeep** (Cardiologist)\n   4.8/5 |ph no: 9876543212| 342 reviews | 12+ years | ₹800\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (Cardiologist)\n   4.7/5 |ph no: 9876543213| 300 reviews | 15+ years | ₹750\n\n` +
+      `👨‍⚕️ **Dr. R. Singh** (Cardiologist)\n   4.6/5 |ph no: 9876543214| 250 reviews | 10+ years | ₹700\n\n` +
+      `All our cardiologists are experts in heart diseases, hypertension, and cardiac care!`;
+  }
+
+  if(/general physician|family doctor/.test(userInput)) {
+    return `**General Physicians** 🩺\n\n` +
+      `Our top general physicians for overall health:\n\n` +
+      `👨‍⚕️ **Dr. S. Kumar** (General Physician)\n   4.7/5 |ph no: 9876543214| 300 reviews | 15+ years | ₹500\n\n` +
+      `👩‍⚕️ **Dr. A. Meena** (General Physician)\n   4.8/5 |ph no: 9876543215| 250 reviews | 18+ years | ₹450\n\n` +
+      `👨‍⚕️ **Dr. S. Ravi** (General Physician)\n   4.7/5 |ph no: 9876543216| 200 reviews | 15+ years | ₹400\n\n` +
+      `All our general physicians are experts in diagnosing and treating a wide range of health conditions!`;
+  }
+
+  // Top Doctors
+  if(/top|best|recommended|leading|expert specialists/.test(userInput)) {
+    return `**Our Top Rated Doctors** 🏆\n\n` +
+      `⭐⭐⭐⭐⭐ **Dr. S. Sundari** (Pediatrician)\n   4.9/5 |ph no: 9876543210|425 reviews | 15+ years | ₹600\n\n` +
+      `⭐⭐⭐⭐⭐ **Dr. K. Vani** (Gynecologist)\n   4.9/5 |ph no: 9876543211|567 reviews | 18+ years | ₹700\n\n` +
+      `⭐⭐⭐⭐ **Dr. Pradeep** (Cardiologist)\n   4.8/5 |ph no: 9876543212|342 reviews | 12+ years | ₹800\n\n` +
+      `⭐⭐⭐⭐ **Dr. Harish** (Orthopedic)\n   4.8/5 |ph no: 9876543213|356 reviews | 11+ years | ₹650\n\n` +
+      `All doctors are verified MCI registered and highly experienced!`;
+  }
+
+  // Consultation Types
+  if(/consultation type|how to consult|ways to consult|in-clinic|video/.test(userInput)) {
+    return `**Consultation Options** 🎯\n\n` +
+      `**1. In-Clinic Consultation** 🏥\n` +
+      `   • Face-to-face with doctor\n` +
+      `   • Physical examination\n` +
+      `   • Average wait: 15-30 mins (with appointment)\n\n` +
+      `**2. Video Consultation** 📱\n` +
+      `   • Consult from home\n` +
+      `   • HD video call with doctor\n` +
+      `   • Duration: 15-30 mins\n` +
+      `   • Prescription sent online\n\n` +
+      `**3. Phone Consultation** ☎️\n` +
+      `   • Quick 10-minute calls\n` +
+      `   • Good for follow-ups\n` +
+      `   • Prescription via email\n\n` +
+      `Which would you prefer?`;
+  }
+
+  // Prescription and Health Records
+  if(/prescription|history|health record|medical record|past report/.test(userInput)) {
+    return `**Your Health Records & Prescriptions** 📋\n\n` +
+      `After consultation, you get:\n\n` +
+      `✓ **Digital Prescription** - Viewable in your account\n` +
+      `✓ **Health Records** - All past reports stored\n` +
+      `✓ **Lab Reports** - Direct access to test results\n` +
+      `✓ **Doctor's Notes** - Detailed consultation notes\n` +
+      `✓ **Follow-up Reminders** - Never miss check-ups\n\n` +
+      `All records are:\n🔒 Secure & Encrypted\n📱 Accessible anytime, anywhere\n👨‍⚕️ Shareable with any doctor\n\n` +
+      `How can I help with your health records?`;
+  }
+
+  // Appointment Features
+  if(/appointment|book|booking|schedule|reschedule/.test(userInput)) {
+    return `**Easy Appointment Booking** 📅\n\n` +
+      `**Step-by-Step Process:**\n\n` +
+      `1️⃣ **Choose Doctor** - Select by specialty or name\n` +
+      `2️⃣ **Pick Date & Time** - See real-time availability\n` +
+      `3️⃣ **Select Type** - In-clinic, Video, or Phone\n` +
+      `4️⃣ **Enter Details** - Your contact information\n` +
+      `5️⃣ **Confirm** - Get instant confirmation\n\n` +
+      `**Features:**\n` +
+      `✓ Real-time availability\n` +
+      `✓ Instant booking confirmation\n` +
+      `✓ SMS & Email reminders\n` +
+      `✓ Free cancellation up to 2 hours\n` +
+      `✓ Money-back guarantee\n\n` +
+      `Ready to book? Tell me your preferred specialty!`;
+  }
+
+  
+  if(/payment|wallet|cashback|cashless|discount|offer|promo/.test(userInput)) {
+    return `**Payment & Offers** 💳\n\n` +
+      `**Payment Methods:**\n` +
+      `✓ Credit/Debit Card\n` +
+      `✓ UPI (Google Pay, PhonePe, Paytm)\n` +
+      `✓ Net Banking\n` +
+      `✓ Digital Wallet\n\n` +
+      `**Current Offers:**\n` +
+      `🎁 First consultation - 20% off\n` +
+      `🎁 Lab tests - Flat ₹200 cashback\n` +
+      `🎁 Referral bonus - ₹500 per successful referral\n` +
+      `🎁 Health plan members - 15% discount on all services\n\n` +
+      `**TAN Loyalty Program:**\n` +
+      `Earn points on every booking & redeem for health services!`;
+  }
+
+  // Greetings and general conversation
+  const greetings = /^(hi|hello|hey|namaste|greetings|good morning|good afternoon|good evening|howdy|what's up)/i;
+  if(greetings.test(userInput)) {
+    const greetingReplies = [
+      "Hello! 👋 I'm TAN, your smart health assistant. I'm here to help you find hospitals, doctors, book appointments, online consultations, lab tests, and much more - just like Practo! What can I do for you today?",
+      "Hi there! Welcome to our comprehensive healthcare platform. Whether you need to consult a doctor, book labs, check doctor profiles, or get online consultations, I'm here to guide you! How can I help?",
+      "Hey! 👋 Great to see you! I can help with:\n🏥 Hospital finder\n👨‍⚕️ Doctor profiles & ratings\n📅 Appointment booking\n💻 Online consultations\n🧪 Lab tests\n📋 Health records\n\nWhat would you like to explore?"
+    ];
+    return greetingReplies[Math.floor(Math.random() * greetingReplies.length)];
+  }
+
+  // Help and capabilities
+  if(/help|what can you do|capabilities|features|guide|assist/.test(userInput)) {
+    return "I'm happy to help! Here's what I can do for you:\n\n" +
+      "🏥 **Find Hospitals** - 21+ hospitals with distance, contact, map\n" +
+      "👨‍⚕️ **Doctor Profiles** - Ratings, reviews, experience, qualifications\n" +
+      "📅 **Book Appointments** - In-clinic, online, or phone consultations\n" +
+      "💻 **Online Consultations** - Video & phone calls with doctors\n" +
+      "🧪 **Lab Tests** - Blood tests, full body checkups, home collection\n" +
+      "🩸 **Blood Availability** - Real-time blood stock in hospitals (11+ centers)\n" +
+      "�️ **Bed Availability** - Real-time hospital beds (ICU, General, Private, Maternity)\n" +
+      "�💉 **Blood Donation** - Save lives, schedule donation appointments\n" +
+      "⭐ **Ratings & Reviews** - Patient feedback for doctors\n" +
+      "📋 **Health Records** - Store prescriptions & medical history\n" +
+      "🔍 **Advanced Search** - Filter by specialty, distance, availability\n\n" +
+      "Just ask me anything! I'm your complete healthcare companion!";
+  }
+
+  // Hospital queries
+  if(/hospital|clinic|medical center|healthcare facility/.test(userInput)) {
+    if(/how many|count|total/.test(userInput)) {
+      return "We have 21 hospitals in our network, ranging from 1 km to 10 km away from you. They include general hospitals, multi-specialty centers, nursing homes, and medical colleges. Would you like to:\n• See all hospitals near you?\n• Filter by distance?\n• Search by type (general, multi-specialty, nursing home, medical college)?\n\nI can help you find the perfect hospital!";
+    }
+    if(/nearest|closest|nearby|around me/.test(userInput)) {
+      return "The closest hospitals to you are:\n\n🏆 **Hope Hospital** - Just 1.0 km away\n   📞 9445022257, 9444083657\n\n🏆 **Sri Balaji Medical and Hospital** - Also 1.0 km away\n   📞 7871767969\n\nBoth are excellent options! Would you like to know about their doctors, facilities, or book an appointment at either one?";
+    }
+    if(/far|farthest|distance/.test(userInput)) {
+      return "Our farthest hospitals are about 10 km away - Sri Sudharsanam Hospital and Meenakshi Hospital. However, we have plenty of excellent hospitals much closer to you (1-7 km range). \n\nWould you like me to help you find hospitals within a specific distance? Just let me know your preferred range!";
+    }
+    return "We have an excellent network of 21 hospitals across your area. Each one is equipped with experienced doctors and various specialties. You can:\n\n✓ Browse the hospital list above with distance and contact info\n✓ Use distance filters to find hospitals in your range\n✓ Search by hospital type (general, multi-specialty, etc.)\n✓ Check doctor schedules at each hospital\n\nWhich hospital interests you, or would you like help finding one?";
+  }
+
+  // Emergency
+  if(/emergency|urgent|urgent care|ambulance|sos|critical|severe|911|108/.test(userInput)) {
+    return "🚨 **EMERGENCY SUPPORT** 🚨\n\nFor life-threatening emergencies:\n• Call the **EMERGENCY button** at the top of the page\n• Call **Ambulance: 108**\n\n**24-Hour Hospitals near you:**\n• **Pettai 24 Hours Hospital** - 3.02 km away\n  General Physician available round-the-clock\n\n• **Mangalam Hospital** - 4.08 km away\n  24-hour emergency care with Dr. S. Ramesh Kumar\n\n• **S.S Hospital** - 3.02 km away\n  Neurological emergency care 24/7\n\nDo you need immediate assistance? Tell me your emergency type and I can guide you to the nearest facility!";
+  }
+
+  // Help & Instructions
+  if(/thanks|thank you|helpful|good bot|thank you so much|awesome|great/.test(userInput)) {
+    return "You're very welcome! 😊 I'm here to assist you anytime. If you have more questions or need help with anything else, just ask! Your health is my priority. Stay safe and take care!";
+  }
+
+  // Default response
+  const genericReplies = [
+    "That's an interesting question! 🤔 To give you the best answer, could you provide a bit more detail? For example:\n\n• Looking for a doctor profile or ratings?\n• Want to book a lab test or consultation?\n• Prefer online or in-clinic appointment?\n• Need health records or prescription help?\n\nLet me know, and I'll be happy to help!",
+    
+    "I want to make sure I understand you correctly! 😊\n\nAre you asking about:\n• Finding doctors & specialists?\n• Booking appointments (in-clinic/online/phone)?\n• Lab tests or health checkups?\n• Doctor ratings and reviews?\n• Health records management?\n\nFeel free to be more specific!",
+    
+    "Great question! 📋 To help you better, could you tell me:\n\n1. What's your main need? (doctor, lab test, appointment, etc.)\n2. Preferred consultation type? (in-clinic/video/phone)\n3. Any specific specialty or service?\n\nWith more details, I can give you perfect assistance!"
+  ];
+  
+  return genericReplies[Math.floor(Math.random() * genericReplies.length)];
+}
+
+
+
+function speak(text) {
+    let speech = new SpeechSynthesisUtterance(text);
+    speech.lang = "en-IN";
+    window.speechSynthesis.speak(speech);
+}
+
+function refreshChat(){
+  location.reload();
+}
+
+// Theme (Dark/Light) toggle and persistence
+function setTheme(theme) {
+  try {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = theme === 'dark' ? '🌙' : '☀️';
+  } catch (e) {
+    console.warn('Theme switch failed', e);
+  }
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+// Initialize theme on load and wire the toggle button
+document.addEventListener('DOMContentLoaded', function(){
+  const saved = localStorage.getItem('theme') || 'light';
+  setTheme(saved);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.addEventListener('click', toggleTheme);
+});
+
+function filterOxygenAvailability() {
+  const locationFilter = document.getElementById("oxygenLocationFilter").value.toLowerCase();
+  const searchText = document.getElementById("oxygenSearch").value.toLowerCase();
+  const container = document.getElementById("oxygenAvailabilityContainer");
+
+  // Get all hospital cards inside oxygenAvailabilityContainer
+  const hospitals = container.querySelectorAll(".oxygen-hospital-card");
+
+  hospitals.forEach(hospital => {
+    const text = hospital.innerText.toLowerCase();
+    const matchesLocation = (locationFilter === "all" || text.includes(locationFilter));
+    const matchesSearch = (searchText === "" || text.includes(searchText));
+
+    if (matchesLocation && matchesSearch) {
+      hospital.style.display = "block";
+    } else {
+      hospital.style.display = "none";
+    }
+  });
+}
+
+function resetOxygenFilter() {
+  document.getElementById("oxygenLocationFilter").value = "all";
+  document.getElementById("oxygenSearch").value = "";
+  const container = document.getElementById("oxygenAvailabilityContainer");
+  const hospitals = container.querySelectorAll(".oxygen-hospital-card");
+  hospitals.forEach(hospital => hospital.style.display = "block");
+}
+
+function filterVetHospitals() {
+  const locationFilter = document.getElementById("vetLocationFilter").value.toLowerCase();
+  const searchText = document.getElementById("vetSearch").value.toLowerCase();
+  const container = document.getElementById("vetHospitalsContainer");
+
+  const hospitals = container.querySelectorAll(".vet-hospital-card");
+
+  hospitals.forEach(hospital => {
+    const text = hospital.innerText.toLowerCase();
+    const matchesLocation = (locationFilter === "all" || text.includes(locationFilter));
+    const matchesSearch = (searchText === "" || text.includes(searchText));
+
+    if (matchesLocation && matchesSearch) {
+      hospital.style.display = "block";
+    } else {
+      hospital.style.display = "none";
+    }
+  });
+}
+
+function resetVetFilter() {
+  document.getElementById("vetLocationFilter").value = "all";
+  document.getElementById("vetSearch").value = "";
+  const container = document.getElementById("vetHospitalsContainer");
+  const hospitals = container.querySelectorAll(".vet-hospital-card");
+  hospitals.forEach(hospital => hospital.style.display = "block");
+}
+
+
+
+
+
+
+
+
+
+   </script>
+
+</body>
+</html>
