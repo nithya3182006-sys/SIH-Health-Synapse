@@ -19,3 +19,67 @@ SIH-Health-Synapse/
 │── SIH HEALTH SYNAPSE.pdf   → Hackathon project document
 │── src/
     └── HealthSynapseDemo.java → Sample Java demo code
+## Backend
+
+Health Synapse is designed with a Java-based backend architecture using Spring Boot and RESTful APIs.
+
+### Backend Technologies
+
+- Java
+- Spring Boot
+- RESTful APIs
+- MySQL
+- Spring Data JPA / Hibernate
+- Spring Security
+- AI API Integration
+- Google Maps API
+
+### Backend Modules
+
+- Hospital Management
+- Doctor Management
+- Appointment Management
+- Blood Availability
+- Bed Availability
+- Ambulance and Emergency Management
+- AI Chatbot
+- User Authentication
+
+### Backend Responsibilities
+
+The backend acts as the communication layer between the frontend and healthcare services. It is responsible for:
+
+- Processing user requests
+- Managing hospital and doctor information
+- Handling appointment bookings
+- Managing blood and bed availability
+- Processing ambulance requests
+- Authenticating users
+- Connecting with AI services
+- Storing and retrieving healthcare data
+- Providing REST APIs to the frontend
+
+### System Architecture
+
+```text
+User
+  |
+  v
+Frontend
+HTML + CSS + JavaScript
+  |
+  | REST API / JSON
+  v
+Java Spring Boot Backend
+  |
+  +-- Hospital Service
+  +-- Doctor Service
+  +-- Appointment Service
+  +-- Blood Service
+  +-- Bed Service
+  +-- Ambulance Service
+  +-- AI Chatbot Service
+  |
+  v
+MySQL Database
+
